@@ -1,0 +1,383 @@
+@import url('https://fonts.googleapis.com/css?family=Kanit'); /*Google Font - Kanit */
+@import url('../css/animated.css'); /*Animaiton CSS */
+
+* {
+    box-sizing: border-box;
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+:root {
+    --background-main: #00a5cf;
+    --font-family-sans-serif: sans-serif;
+    --font-family-kanit: 'Kanit', sans-serif;
+    --font-family-monospace: monospace;
+    --font-size: 13.33px;
+}
+
+/* width */
+::-webkit-scrollbar {
+    width: 13px;
+    height: 8px;
+    border-radius: 4px;
+    background-color: rgba(0,0,0,.0);
+    transition-duration: 1s;
+}
+
+::-webkit-scrollbar:hover {
+    background-color: rgba(0,0,0,.1);
+    transition-duration: .15s;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    border-radius: 4px;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background-color: rgba(64, 64, 64, 0.2);
+    border-radius: 4px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(64, 64, 64, 0.5);
+    /*background-color: rgb(171, 4, 102);*/
+}
+
+html,body {
+    margin: 0;
+	height: 100%;
+    background-color: var(--background-main);
+    overflow: hidden;
+    font-family: var(--font-family-sans-serif);
+    color: #5d5d5d;
+    background-image: url(../img/Logo.png);
+    background-position: center;
+    background-size: 250px;
+    background-repeat: no-repeat;
+}
+
+h1, h2, h3, h4, p, ul {
+    margin: 0;
+}
+
+.inline-block {
+    display: inline;
+}
+
+.float-left {
+    float: left;
+}
+
+.float-right {
+    float: right;
+}
+
+.arrow-right {
+    display: inline-block;
+    position: absolute;
+    top: calc(50% - 2px);
+    right: 10px;
+    transform: translateY(-50%);
+    font-size: 18px;
+}
+
+.arrow-right span {
+    display: none;
+}
+
+
+#app-titleBar {
+    position: relative;
+    display: flex;
+    width: 100%;
+    height: 30px;
+    color: white;
+    background-color: rgba(0,0,0,.2);
+    -webkit-user-select: none;
+    -webkit-app-region: drag;
+    opacity: 0;
+    animation-name: fadeIn;
+    animation-duration: .25s;
+    animation-fill-mode: forwards;
+    transition-duration: .1s;
+    z-index: 999999;
+}
+
+#app-titleBar span {
+    padding-left: 10px;
+    line-height: 30px;
+}
+
+#app-titleBar .btnArea {
+    margin-left: auto;
+    height: 100%;
+    top: 0;
+    right: 0;
+    -webkit-app-region: no-drag;
+}
+
+#app-titleBar .btnArea button {
+    width: 40px;
+    height: 100%;
+    border: 0px transparent solid;
+    color: white;
+    background: rgba(0,0,0,0);
+    font-size: 19px;
+    outline: none;
+    transition-duration: .15s;
+}
+
+#app-titleBar .btnArea button:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+#app-titleBar .btnArea button:active {
+    background: rgba(0,0,0,0.2);
+    transition-duration: 0s;
+}
+
+#favicon {
+    transform: translateY(5px);
+    height: 20px;
+}
+
+#app-frame {
+    margin-left: 8px;
+    display: flex;
+    opacity: 0;
+    animation-delay: .25s;
+    animation-name: fadeIn;
+    animation-duration: .25s;
+    animation-fill-mode: forwards;
+    transition-duration: .1s;
+    -webkit-app-region: no-drag;
+}
+
+#app-frame button {
+    display: inline-block;
+    padding: 0 8px;
+    height: 100%;
+    background: transparent;
+    font-family: inherit;
+    font-size: var(--font-size);
+    color: rgba(255, 255, 255, 0.74);
+    border: none;
+    outline: none;
+    transition-duration: .25s;
+}
+
+#app-frame button:hover {
+    background-color: rgba(255, 255, 255, .15);
+}
+
+#app-frame button.active {
+    transition-duration: 0s;
+    color: black;
+    background-color: #f7f7f7;
+}
+
+#btn-close:hover {
+    background: rgba(255, 0, 0, 0.8);
+}
+
+#btn-close:active {
+    background: rgba(153, 0, 0, 0.8);
+}
+
+#app-contentArea {
+    position: relative;
+    width: 100%;
+    height: calc(100% - 30px);
+    opacity: 0;
+    animation-delay: .5s;
+    animation-name: zoomInOut;
+    animation-duration: .5s;
+    animation-fill-mode: forwards;
+    transition-duration: .1s;
+}
+
+#app-contentArea .toolsMenu {
+    display: flex;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    color: white;
+    background-color: var(--background-main);
+    z-index: 50;
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+#app-contentArea .page {
+    padding-top: 50px;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+}
+
+.frame-section {
+    position: absolute;
+    padding: 5px 0;
+    min-width: 200px;
+    background-color: #f7f7f7;
+    box-shadow: 0 0 5px 1px #5d5d5d;
+    z-index: 600;
+}
+
+.frame-section .line {
+    margin: 1px 0;
+    border-top: 1px #eaeaea solid;
+}
+.frame-section a {
+    display: block;
+    padding: 5px 0 5px 20px;
+    font-size: var(--font-size);
+    transition-duration: .25s;
+}
+
+.frame-section a:hover {
+    background-color: rgba(0,0,0,.1);
+}
+
+.frame-section a.active {
+    background-color: rgba(0,0,0,.1);
+}
+
+.frame-section a .more-section {
+    float: right;
+    padding-right: 8px;
+    font-size: 16px;
+    font-family: monospace;
+    transform: translateY(-2px);
+}
+
+.overay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,.3);
+    z-index: 500;
+    animation: fadeIn .25s forwards;
+}
+
+#btn-main-menu {
+    position: absolute;
+    padding: 5px 8px;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    font-size: 20px;
+    color: white;
+    background: transparent;
+    border-radius: 100%;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition-duration: .25s;
+}
+
+#btn-main-menu:hover {
+    background-color: rgba(0, 0, 0, .1)
+}
+
+#btn-main-menu:active {
+    transition-duration: .25s;
+    background-color: rgba(0, 0, 0, .3)
+}
+
+#tab-option-module {
+    margin-left: 54px;
+    width: 300px;
+    border-left: 1px rgba(0, 0, 0, .2) solid;
+}
+
+.panel-tab-option {
+    position: relative;
+    display: flex;
+    padding: 10px;
+    height: 100%;
+    font-size: 12px;
+    color: rgba(255,255,255,.85);
+    border-right: 1px rgba(0, 0, 0, .2) solid;
+    transition-duration: .25s;
+}
+
+.panel-tab-option:hover {
+    background-color: rgba(255,255,255,.15);
+}
+
+.panel-tab-option h3 {
+    color: white;
+}
+
+.panel-tab-option svg {
+    font-size: 20px;
+    height: 100%;
+    margin-right: 10px;
+}
+
+.panel-tab-option.pointing {
+    cursor: pointer;
+}
+
+.panel-tab-option.pointing:active {
+    background-color: rgba(0,0,0,.075);
+}
+
+.btn-panel {
+    position: relative;
+    display: inline-block;
+    padding: 10px;
+    height: 100%;
+    color: rgba(255,255,255,.85);
+    border-right: 1px rgba(0, 0, 0, .2) solid;
+}
+
+.btn-panel button {
+    position: relative;
+    width: 31px;
+    height: 31px;
+    font-size: 18px;
+    color: white;
+    background: transparent;
+    border-radius: 100%;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition-duration: .25s;
+}
+
+.btn-panel button:hover {
+    background-color: rgba(0, 0, 0, .1)
+}
+
+.btn-panel button:active {
+    transition-duration: .25s;
+    background-color: rgba(0, 0, 0, .3)
+}
+
+.btn-panel button svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+}
+
+#label-panel {
+    margin-left: auto;
+}

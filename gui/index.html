@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>GUI Image Model-training</title>
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
+    <link rel="stylesheet" type="text/css" href="./platform/css/platform-windows.css">
+
+    <!-- Insert this line above script imports  -->
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+
+    <!-- normal script imports etc  -->
+    <script src="./js/jquery.min.js"></script>
+    <script src="./platform/js/platform-windows.js"></script>
+    <script src="./js/index.js"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.6.3/js/all.js" integrity="sha384-EIHISlAOj4zgYieurP0SdoiBYfGJKkgWedPHH4jCzpCXLmzVsw1ouK59MuUtP4a1" crossorigin="anonymous"></script>
+
+    <!-- Insert this line after script imports -->
+    <script>if (window.module) module = window.module;</script>
+</head>
+<body onload="loadFunction();">
+    <div id="app-titleBar">
+        <span><img id="favicon" src="img/mini-Logo.png"></span>
+        <div id="app-frame">
+            <script>
+                loadComponent('./component/appFrame' ,'#app-frame');
+            </script>
+        </div>
+        <div class="btnArea">
+            <button id="btn-min">−</button>
+            <button id="btn-max">&square;</button>
+            <button id="btn-close">X</button>
+        </div>
+    </div>
+    <div id="app-contentArea">
+        <div class="toolsMenu">
+            <button id="btn-main-menu"><i class="fas fa-bars"></i></button>
+            <div id="tab-option-module" class="panel-tab-option">
+                <i class="fas fa-cubes"></i>
+                <div>
+                    <p>Project Name:</p>
+                    <h3>Model Name - Training... 60%</h3>
+                </div>
+                <p class="arrow-right">
+                    <span class="down" style="display: block;"><i class="fas fa-sort-down"></i></span>
+                    <span class="up"><i class="fas fa-sort-up"></i></span>
+                </p>
+            </div>
+            <div id="training-panel" class="panel-tab-option pointing">
+                <i class="fas fa-play"></i>
+                <div>
+                    <h3>Start Train</h3>
+                    <p>with GPU</p>
+                </div>
+            </div>
+            <div id="label-panel" class="btn-panel">
+                <button><i class="far fa-edit"></i></button>
+                <button><i class="far fa-trash-alt"></i></button>
+                <button><i class="fas fa-info"></i></button>
+            </div>
+        </div>
+        <div class="page"></div>
+    </div>
+</body>
+</html>
