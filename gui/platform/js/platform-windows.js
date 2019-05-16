@@ -10,13 +10,11 @@ const _componentOption = {
 
 window.addEventListener('focus', function() {
   document.getElementById('app-titleBar').style.backgroundColor ="";
-  $('#app-contentArea .toolsMenu').css('border-bottom', "1px solid rgba(0, 0, 0, 0)");
 });
 
 window.addEventListener('blur', function() {
   document.getElementById('app-titleBar').style.backgroundColor = "rgba(0,0,0,.0)";
-  $('#app-contentArea .toolsMenu').css('border-bottom', "");
-  closeAppFrame();
+  //closeAppFrame();
 });
 
 function getSiteGlobal() {

@@ -16,7 +16,8 @@
 }
 
 :root {
-    --background-main: #00a5cf;
+    --bg-main: #374042;
+    --bg-croping-image: #2c3435;
     --font-family-sans-serif: sans-serif;
     --font-family-kanit: 'Kanit', sans-serif;
     --font-family-monospace: monospace;
@@ -57,10 +58,10 @@
 html,body {
     margin: 0;
 	height: 100%;
-    background-color: var(--background-main);
+    background-color: var(--bg-main);
     overflow: hidden;
     font-family: var(--font-family-sans-serif);
-    color: #5d5d5d;
+    color: #d4d4d4;
     background-image: url(../img/Logo.png);
     background-position: center;
     background-size: 250px;
@@ -183,8 +184,7 @@ h1, h2, h3, h4, p, ul {
 
 #app-frame button.active {
     transition-duration: 0s;
-    color: black;
-    background-color: #f7f7f7;
+    background-color: #1b1d1d;
 }
 
 #btn-close:hover {
@@ -215,9 +215,10 @@ h1, h2, h3, h4, p, ul {
     width: 100%;
     height: 50px;
     color: white;
-    background-color: var(--background-main);
+    background-color: var(--bg-main);
     z-index: 50;
     border-top: 1px solid rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 #app-contentArea .page {
@@ -232,14 +233,14 @@ h1, h2, h3, h4, p, ul {
     position: absolute;
     padding: 5px 0;
     min-width: 200px;
-    background-color: #f7f7f7;
-    box-shadow: 0 0 5px 1px #5d5d5d;
+    background-color: #1b1d1d;
+    box-shadow: 0 0 5px 1px #51757d;
     z-index: 600;
 }
 
 .frame-section .line {
     margin: 1px 0;
-    border-top: 1px #eaeaea solid;
+    border-top: 1px #313131 solid;
 }
 .frame-section a {
     display: block;
@@ -249,11 +250,11 @@ h1, h2, h3, h4, p, ul {
 }
 
 .frame-section a:hover {
-    background-color: rgba(0,0,0,.1);
+    background-color: rgba(255,255,255,.1);
 }
 
 .frame-section a.active {
-    background-color: rgba(0,0,0,.1);
+    background-color: rgba(255,255,255,.1);
 }
 
 .frame-section a .more-section {
@@ -270,7 +271,7 @@ h1, h2, h3, h4, p, ul {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,.3);
+    background-color: rgba(0,0,0,.4);
     z-index: 500;
     animation: fadeIn .25s forwards;
 }
@@ -292,12 +293,12 @@ h1, h2, h3, h4, p, ul {
 }
 
 #btn-main-menu:hover {
-    background-color: rgba(0, 0, 0, .1)
+    background-color: rgba(255, 255, 255, .1)
 }
 
 #btn-main-menu:active {
     transition-duration: .25s;
-    background-color: rgba(0, 0, 0, .3)
+    background-color: rgba(255, 255, 255, .3)
 }
 
 #tab-option-module {
@@ -318,7 +319,7 @@ h1, h2, h3, h4, p, ul {
 }
 
 .panel-tab-option:hover {
-    background-color: rgba(255,255,255,.15);
+    background-color: rgba(255,255,255,.05);
 }
 
 .panel-tab-option h3 {
@@ -336,7 +337,12 @@ h1, h2, h3, h4, p, ul {
 }
 
 .panel-tab-option.pointing:active {
+    transition-duration: .1s;
     background-color: rgba(0,0,0,.075);
+}
+
+.panel-tab-option.pointing svg {
+    font-size: 16px;
 }
 
 .btn-panel {
@@ -352,7 +358,7 @@ h1, h2, h3, h4, p, ul {
     position: relative;
     width: 31px;
     height: 31px;
-    font-size: 18px;
+    font-size: 16px;
     color: white;
     background: transparent;
     border-radius: 100%;
@@ -363,21 +369,40 @@ h1, h2, h3, h4, p, ul {
 }
 
 .btn-panel button:hover {
-    background-color: rgba(0, 0, 0, .1)
+    background-color: rgba(255, 255, 255, .1)
 }
 
 .btn-panel button:active {
     transition-duration: .25s;
-    background-color: rgba(0, 0, 0, .3)
+    background-color: rgba(255, 255, 255, .3)
 }
 
 .btn-panel button svg {
     position: absolute;
     top: 50%;
-    left: 50%;
+    left: calc(50% + 1px);
     transform: translateX(-50%) translateY(-50%);
 }
 
 #label-panel {
     margin-left: auto;
+}
+
+#pageCroping {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+#pageCroping .panel-backgroundImage {
+    width: calc(100% - 250px);
+    height: 100%;
+    background-color: var(--bg-croping-image);
+}
+
+#pageCroping .panel-list {
+    width: 250px;
+    height: 100%;
+    background-color: var(--bg-main);
+    border-left: 1px solid rgba(0, 0, 0, 0.2);
 }
