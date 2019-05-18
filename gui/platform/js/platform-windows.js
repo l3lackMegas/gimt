@@ -9,12 +9,14 @@ const _componentOption = {
 }
 
 window.addEventListener('focus', function() {
-  document.getElementById('app-titleBar').style.backgroundColor ="";
+  document.getElementById('app-titleBar').style.backgroundColor = "";
+  $('body').css('border', '');
 });
 
 window.addEventListener('blur', function() {
   document.getElementById('app-titleBar').style.backgroundColor = "rgba(0,0,0,.0)";
-  //closeAppFrame();
+  $('body').css('border', '1px #4d6063 solid');
+  closeAppFrame();
 });
 
 function getSiteGlobal() {
@@ -180,11 +182,11 @@ function changeBorderWindows() {
     }
   }
 
-  setInterval(() => {
-    changeBorderWindows();
-  }, 1000);
-
   (function () {
+
+    $( window ).resize(function() {
+      changeBorderWindows();
+    });
   
     function init() {
       document.getElementById("btn-min").addEventListener("click", function (e) {

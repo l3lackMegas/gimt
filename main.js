@@ -33,7 +33,7 @@ global.Site = {
   isError: false,
   errorTitle: "",
   errorMsg: "",
-  isDev: false
+  isDev: true
 };
 
 function createWindow () {
@@ -48,8 +48,8 @@ let mainWindowState = windowStateKeeper({
     y: mainWindowState.y,
     width: mainWindowState.width,
     height: mainWindowState.height,
-    minWidth: 1100,
-    minHeight: 600,
+    minWidth: 1230,
+    minHeight: 700,
     frame: false,
     hasShadow: true,
     backgroundColor: "#00a5cf",

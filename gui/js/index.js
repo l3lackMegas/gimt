@@ -19,7 +19,30 @@ var _U = {},
     isSecFrameOpen = false;
 
 function loadFunction() {
-  
+  setTimeout(() => {
+    footerStatus('available');
+  }, 1500);
+}
+
+function footerStatus(mode) {
+  if($('body').hasClass('maximum'))
+    $('body').attr('class', 'maximum');
+  else
+    $('body').attr('class', '');
+  switch(mode) {
+    case 'available' :
+      $('body').addClass('available');
+      $('#footer-txtStatus').html('<i class="fas fa-check-circle"></i> Ready');
+      break;
+
+    case 'training' :
+      $('body').addClass('training');
+      $('#footer-txtStatus').html('<i class="fas fa-circle-notch fa-spin"></i> Training...');
+      break;
+
+    default :
+      $('#footer-txtStatus').html('<i class="fas fa-check-circle"></i> Ready');
+  }
 }
 
 function loadComponent(urlPath ,id ,fn){
