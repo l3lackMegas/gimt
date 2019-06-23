@@ -1,12 +1,13 @@
+'use strict';
 const electron = require('electron')
 const windowStateKeeper = require('electron-window-state');
 const {download} = require("electron-dl");
 const {ipcMain} = require('electron')
+const fsExtra = require('fs-extra')
 // Module to control application life.
 const app = electron.app
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
-
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 
@@ -29,7 +30,8 @@ if (!gotTheLock) {
 
 global.Site = {
   version: app.getVersion(),
-  url: "https://bnk.48gen.com",
+  startPath: `${__dirname}`,
+  startPathUrl: `file://${__dirname}`,
   isError: false,
   errorTitle: "",
   errorMsg: "",
@@ -38,10 +40,10 @@ global.Site = {
 
 function createWindow () {
   
-let mainWindowState = windowStateKeeper({
-  defaultWidth: 1100,
-  defaultHeight: 600
-});
+  let mainWindowState = windowStateKeeper({
+    defaultWidth: 1100,
+    defaultHeight: 600
+  });
   // Create the browser window.
   mainWindow = new BrowserWindow({
     x: mainWindowState.x,
@@ -52,16 +54,19 @@ let mainWindowState = windowStateKeeper({
     minHeight: 700,
     frame: false,
     hasShadow: true,
-    backgroundColor: "#00a5cf",
+    backgroundColor: "#374042",
     show: false,
     fullscreen: false,
+    webPreferences: {
+      nodeIntegration: true
+    }
   })
   //mainWindowState.manage(mainWindow)
   // and load the index.html of the app.
 
   mainWindow.loadURL(`file://${__dirname}/gui/index.html`)
   //mainWindow.loadURL(`file://${__dirname}/design/error.html`)
-
+  mainWindow.show();
   // Open the DevTools.
   if(global.Site.isDev == true) mainWindow.webContents.openDevTools();
 
@@ -74,7 +79,7 @@ let mainWindowState = windowStateKeeper({
   })
   mainWindow.on('ready-to-show', function () {
     //mainWindow.maximize();
-    mainWindow.show();
+    //mainWindow.show();
   })
   
 }
@@ -89,6 +94,7 @@ app.on('ready', function() {
     download(BrowserWindow.getFocusedWindow(), info.url, info.properties)
         .then(dl => mainWindow.webContents.send("download complete", dl.getSavePath()));
   });
+
   createWindow();
 
 });
@@ -109,4 +115,15 @@ app.on('activate', function () {
   if (mainWindow === null) {
     createWindow()
   }
+})
+
+ipcMain.on('SAVE_FILE', (event, path, buffer, obj) => {
+    fsExtra.outputFile(path, buffer, err => {
+        if (err) {
+            event.sender.send('ERROR', err.message)
+        } else {
+            event.sender.send('SAVED_FILE', path, obj)
+            //console.log(obj);
+        }
+    })
 })

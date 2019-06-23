@@ -1,4 +1,18 @@
 <script>
+    function getRecent4Frame() {
+        var finalFrameSet = [];
+        $.each(_State.lastOpen, function( index, value ) {
+            var states = {
+                namespace: value,
+                label: _State.projectsDetail[value].title,
+                action: function(data) {
+                    dropModelOpen(data.namespace);
+                }
+            }
+            finalFrameSet.push(states);
+        });
+        return finalFrameSet;
+    }
     var appToolbars = new appframeInit({
         id: '#app-frame',
         menuTools: [
@@ -17,6 +31,7 @@
                         {
                             namespace: 'add-label',
                             label: 'New Label',
+                            isDisable: true,
                             action: function(data) {
                                 alert(data.label + ' Clicked!');
                             }
@@ -34,16 +49,24 @@
                             namespace: 'open-recent',
                             label: 'Open Recent',
                             subSection: [
-                                [
-                                    {
-                                        namespace: 'recent-example',
-                                        label: 'Example Model',
-                                        action: function(data) {
-                                            alert(data.label + ' Clicked!');
-                                        }
-                                    }
-                                ]
+                                getRecent4Frame()
                             ]
+                        }
+                    ],
+                    [
+                        {
+                            namespace: 'save-project',
+                            label: 'Save',
+                            action: function(data) {
+                                alert(data.label + ' Clicked!');
+                            }
+                        },
+                        {
+                            namespace: 'save-project-as',
+                            label: 'Save As...',
+                            action: function(data) {
+                                alert(data.label + ' Clicked!');
+                            }
                         }
                     ],
                     [
@@ -55,6 +78,7 @@
                                     {
                                         namespace: 'import-weight',
                                         label: 'Import Weight',
+                                        isDisable: true,
                                         action: function(data) {
                                             alert(data.label + ' Clicked!');
                                         }
@@ -62,6 +86,7 @@
                                     {
                                         namespace: 'import-dataset',
                                         label: 'Import Dataset',
+                                        isDisable: true,
                                         action: function(data) {
                                             alert(data.label + ' Clicked!');
                                         }
@@ -77,6 +102,7 @@
                                     {
                                         namespace: 'export-weight',
                                         label: 'Export Weight',
+                                        isDisable: true,
                                         action: function(data) {
                                             alert(data.label + ' Clicked!');
                                         }
@@ -84,6 +110,7 @@
                                     {
                                         namespace: 'export-dataset',
                                         label: 'Export Dataset',
+                                        isDisable: true,
                                         action: function(data) {
                                             alert(data.label + ' Clicked!');
                                         }
@@ -118,6 +145,7 @@
                         {
                             namespace: 'edit-project-name',
                             label: 'Edit Project Name',
+                            isDisable: true,
                             action: function (data) {
                                 alert(data.label + ' Clicked!');
                             }
@@ -125,6 +153,7 @@
                         {
                             namespace: 'edit-model-name',
                             label: 'Edit Model Name',
+                            isDisable: true,
                             action: function (data) {
                                 alert(data.label + ' Clicked!');
                             }
@@ -149,6 +178,7 @@
                         {
                             namespace: 'start-train',
                             label: 'Start Train',
+                            isDisable: true,
                             action: function (data) {
                                 alert(data.label + ' Clicked!');
                             }
@@ -156,6 +186,7 @@
                         {
                             namespace: 'stop-train',
                             label: 'Stop Train',
+                            isDisable: true,
                             action: function (data) {
                                 alert(data.label + ' Clicked!');
                             }
@@ -165,6 +196,7 @@
                         {
                             namespace: 'test-model',
                             label: 'Test Model',
+                            isDisable: true,
                             action: function (data) {
                                 alert(data.label + ' Clicked!');
                             }

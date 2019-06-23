@@ -1,89 +1,39 @@
-<div id="pageCroping">
+<div id="pageCroping" class="areaPage">
     <div class="panel-backgroundImage">
-        <div id="exampleIMG"></div>
+        <div id="imgPositionControl">
+            <div id="exampleIMG" target="0"><img></div>
+        </div>
         <div id="tools-float">
             <a><i class="fas fa-crop-alt"></i></a>
             <a><i class="fas fa-eraser"></i></a>
-            <a><i class="fas fa-search-plus"></i></a>
-            <a><i class="fas fa-search-minus"></i></a>
-            <a><i class="fas fa-chevron-left"></i></a>
-            <a><i class="fas fa-chevron-right"></i></a>
+            <a onclick="imgCropPositionControl('zoomOut');"><i class="fas fa-search-minus"></i></a>
+            <a onclick="imgCropPositionControl('zoomIn');"><i class="fas fa-search-plus"></i></a>
+            <a onclick="imgCropArrowsNavigate('back');"><i class="fas fa-chevron-left"></i></a>
+            <a onclick="imgCropArrowsNavigate('next');"><i class="fas fa-chevron-right"></i></a>
         </div>
     </div>
     <div class="panel-list">
         <div id="list-label" class="contentArea">
             <h4 class="title">Label List</h4>
             <ul>
-                <li>
-                    <a>Cat</a>
-                </li>
-                <li>
-                    <a>Dog</a>
-                </li>
-                <li>
-                    <a>Bird</a>
-                </li>
-                <li>
-                    <a>Fox</a>
-                </li>
-                <li>
-                    <a>Horse</a>
-                </li>
-                <li>
-                    <a>Horse</a>
-                </li>
-                <li>
-                    <a>Horse</a>
-                </li>
-                <li>
-                    <a>Horse</a>
-                </li>
-                <li>
-                    <a>Horse</a>
-                </li>
-                <li>
-                    <a>Horse</a>
-                </li>
-                <li>
-                    <a>Horse</a>
-                </li>
-                <li>
-                    <a>Horse</a>
-                </li>
+                <script>
+                    $('#list-label ul').html('');
+                    $.each(_U.solution.label, function( index, value ) {
+                        $('#list-label ul').append('<li><a>' + value + '</a></li>');
+                    });
+                </script>
             </ul>
         </div>
         <div id="list-queue-image" class="contentArea">
             <h4 class="title">Queue Images</h4>
             <ul>
-                <li>
-                    <a>Cat.jpg</a>
-                </li>
-                <li>
-                    <a>Cat.jpg</a>
-                </li>
-                <li>
-                    <a>Cat.jpg</a>
-                </li>
-                <li>
-                    <a>Cat.jpg</a>
-                </li>
-                <li>
-                    <a>Cat.jpg</a>
-                </li>
-                <li>
-                    <a>Cat.jpg</a>
-                </li>
-                <li>
-                    <a>Cat.jpg</a>
-                </li>
-                <li>
-                    <a>Cat.jpg</a>
-                </li>
-                <li>
-                    <a>Cat.jpg</a>
-                </li>
-                
+                <script>
+                    $('#list-queue-image ul').html('');
+                    $.each(_U.solution.dataset, function( index, value ) {
+                        $('#list-queue-image ul').append('<li onclick="imgCropSelect( ' + index + ', this)"><a>' + value.filename + '</a></li>');
+                    });
+                </script>
             </ul>
         </div>
     </div>
-</div>>
+</div>

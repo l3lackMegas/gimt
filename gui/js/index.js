@@ -4,44 +4,116 @@ window.addEventListener('keydown', function(evt) {
   if (evt.keyCode == 122) evt.preventDefault(); //FullScreen F11
 });
 
-const components = {
-  frameSection: '<div class="frame-section"></div>'
-}
+const fs = require('fs'),
+      components = {
+        frameSection: '<div class="frame-section"></div>',
+        toolsDropPanel: '<div class="tools-drop-panel"></div>'
+      }
 
-var _U = {},
+var _State = {},
+    _U = {},
     _Log = [],
-    UIComponent = {
-      homeCardPost: '',
-      pagePost: '',
-      pagePostReply: ''
-    },
     isFrameOpen = false,
-    isSecFrameOpen = false;
+    isSecFrameOpen = false,
+    isTDP = false,
+    _StateTP = {
+      projectPath: '',
+      solutionFile: ''
+    };
+
+var autoSaveState;
 
 function loadFunction() {
   setTimeout(() => {
-    footerStatus('available');
-  }, 1500);
+    footerStatus('preparing', 'Loading State...');
+    getStateFilesData(getSiteGlobal('Site').startPath + '\\state.json', function(stateData) {
+      _State = stateData;
+      loadComponent('./component/appFrame' ,'#app-frame', function() {
+        setTimeout(() => {
+          footerStatus('preparing', 'Loading GUI...');
+          setTimeout(() => {
+            $('#app-contentArea').show();
+            var argPathProject = '';
+            if(fs.existsSync(remote.process.argv[1]) == true && remote.process.argv[1] != ".")
+              argPathProject = remote.process.argv[1];
+            else
+              argPathProject = _State.projectsDetail[_State.lastOpen[0]].path;
+
+            _StateTP.solutionFile = argPathProject;
+            _StateTP.projectPath = require('path').dirname(argPathProject);
+            getStateFilesData(argPathProject, function(projectData) {
+              dropModelOpen(projectData.project.namespace);
+              footerStatus('available');
+              loadEvents();
+            });
+          }, 1000);
+        }, 500);
+      });
+    });
+  }, 1000);
+  $('.overay').click(function(e) {
+    closeAppFrame(e);
+  });
 }
 
-function footerStatus(mode) {
+function loadEvents() {
+  $( window ).resize(function() {
+    if($("#pageDatasets").length > 0) {
+      $('#image-grid-area').width(160 * Math.floor(($("#pageDatasets").width() / 160)));
+    }
+  });
+}
+
+function getStateFilesData(path, fn) {
+    var filename = path;
+    fs.readFile(filename, 'utf8', function(err, data) {
+      if (err) throw err;
+      if(fn) fn(JSON.parse(data));
+    });
+}
+
+function writeStatesFilesData(path, value, fn) {
+  var fs = require('fs');
+
+  fs.writeFile(path, value, 'utf8', function(err, data) {
+    if (err) throw err;
+    if(fn) fn(path);
+  });
+}
+
+function saveProgramStateData() {
+  writeStatesFilesData(getSiteGlobal('Site').startPath + '\\state.json', JSON.stringify(_State, null, 2), function() {
+    keepLog('State Saved!');
+  });
+}
+
+function saveProjectData() {
+  writeStatesFilesData(_StateTP.solutionFile, JSON.stringify(_U, null, 2), function() {
+    keepLog('Project Save Saved!');
+  });
+}
+
+function footerStatus(mode, msg) {
   if($('body').hasClass('maximum'))
     $('body').attr('class', 'maximum');
   else
     $('body').attr('class', '');
   switch(mode) {
     case 'available' :
+      if(!msg) msg = "Ready";
       $('body').addClass('available');
-      $('#footer-txtStatus').html('<i class="fas fa-check-circle"></i> Ready');
+      $('#footer-txtStatus').html('<i class="fas fa-check-circle"></i> ' + msg);
       break;
 
     case 'training' :
+      if(!msg) msg = "Training...";
       $('body').addClass('training');
-      $('#footer-txtStatus').html('<i class="fas fa-circle-notch fa-spin"></i> Training...');
+      $('#footer-txtStatus').html('<i class="fas fa-circle-notch fa-spin"></i> ' + msg);
       break;
 
-    default :
-      $('#footer-txtStatus').html('<i class="fas fa-check-circle"></i> Ready');
+    case 'preparing' :
+      if(!msg) msg = "Preparing...";
+      $('#footer-txtStatus').html('<i class="fas fa-circle-notch fa-spin"></i> ' + msg);
   }
 }
 
@@ -58,11 +130,13 @@ function loadComponent(urlPath ,id ,fn){
         var found = $(elements).filter(id);
         keepLog('Ref.: "' + id + '", "' + urlPath + '" | Element "#' + $(response).attr('id') + ', .' + $(response).attr('class') + '": ' + found.length);
         if(found.length == 0) {
-          $(id).append(elements);
+          $(id).html(elements);
         } else {
-          $(id).append(found.html());
+          $(id).html(found.html());
         }
-        if(fn){fn();}
+        if(_State.hasOwnProperty('lasOpen') == true) saveProgramStateData();
+        resetImgCropPositionControl()
+        if(fn) fn();
       },
       error: function(jqXHR, exception) {
         setTimeout(function() {
@@ -91,15 +165,25 @@ function loadComponent(urlPath ,id ,fn){
 function appframeInit(data) {
   var coreObj = {},
       actionObj = {},
-      ss = {};
+      ss = {},
+      isDisable = {};
   $.each(data.menuTools, function( index, value ) {
     $(data.id).append('<button id="btn-app-frame-' + value.namespace + '" data="' + value.namespace + '">' + value.label + '</button>') ;
     if(value.subSection) $.each(value.subSection, function( index, ssValue ) {
       $.each(ssValue, function( index, gSsValue ) {
+        if(gSsValue.isDisable)
+          isDisable[gSsValue.namespace] = gSsValue.isDisable;
+        else
+          isDisable[gSsValue.namespace] == false;
+        
         ss[gSsValue.namespace] = gSsValue;
         if(gSsValue.action) actionObj[gSsValue.namespace] = gSsValue;
         if(gSsValue.subSection) $.each(gSsValue.subSection, function( index, mSsValue ) {
           $.each(mSsValue, function( index, MgSsValue ) {
+            if(MgSsValue.isDisable)
+              isDisable[MgSsValue.namespace] = MgSsValue.isDisable;
+            else
+              isDisable[gSsValue.namespace] == false;
             if(MgSsValue.action) actionObj[MgSsValue.namespace] = MgSsValue;
           });
         });
@@ -109,6 +193,7 @@ function appframeInit(data) {
   });
   $('#app-frame button').click(function(e) {
     if(isFrameOpen == false) {
+      //if(isTDP == true) closeToolsDropPanel({skip: true});
       isFrameOpen = true;
       $('#app-frame button').removeClass('active');
       $(this).addClass('active');
@@ -116,15 +201,17 @@ function appframeInit(data) {
       $.each(coreObj[$(this).attr('data')].subSection, function( index, subSectionVal ) {
         if(index > 0) cmpSec.append('<div class="line"></div>');
         $.each(subSectionVal, function( index, section ) {
+          var disableClass = ''
+          if(isDisable[section.namespace]) disableClass = 'class="disable" ';
           if(section.subSection)
-            cmpSec.append('<a onmouseover="subSectionAppFrame(\'' + section.namespace + '\', this)" onclick="actionAppFrame(\'' + section.namespace + '\')">' + section.label + '<span class="more-section">></span></a>');
+            cmpSec.append('<a id="frame-' + section.namespace + '"' + disableClass + 'onmouseover="subSectionAppFrame(\'' + section.namespace + '\', this)" onclick="actionAppFrame(\'' + section.namespace + '\')">' + section.label + '<span class="more-section">></span></a>');
           else
-            cmpSec.append('<a onmouseover="subSectionAppFrame(\'' + section.namespace + '\', this)" onclick="actionAppFrame(\'' + section.namespace + '\')">' + section.label + '</a>');
+            cmpSec.append('<a id="frame-' + section.namespace + '"' + disableClass + 'onmouseover="subSectionAppFrame(\'' + section.namespace + '\', this)" onclick="actionAppFrame(\'' + section.namespace + '\')">' + section.label + '</a>');
         });
       });
       cmpSec.css('left', e.target.offsetLeft + 'px');
       $('#app-contentArea').prepend(cmpSec[0].outerHTML);
-      if($('.overay').length < 1) $('#app-contentArea').prepend('<div class="overay" onclick="closeAppFrame(this)"></div>');
+      if($('#ov-Frame').length < 1) $('#app-contentArea').prepend('<div id="ov-Frame" class="overay" style="z-index: 900;" onclick="closeAppFrame(this)"></div>');
     } else {
       closeAppFrame();
     }
@@ -139,10 +226,12 @@ function appframeInit(data) {
       $.each(coreObj[$(this).attr('data')].subSection, function( index, subSectionVal ) {
         if(index > 0) cmpSec.append('<div class="line"></div>');
         $.each(subSectionVal, function( index, section ) {
+          var disableClass = ''
+          if(isDisable[section.namespace]) disableClass = 'class="disable" ';
           if(section.subSection)
-            cmpSec.append('<a onmouseover="subSectionAppFrame(\'' + section.namespace + '\', this)" onclick="actionAppFrame(\'' + section.namespace + '\')">' + section.label + '<span class="more-section">></span></a>');
+            cmpSec.append('<a id="frame-' + section.namespace + '"' + disableClass + 'onmouseover="subSectionAppFrame(\'' + section.namespace + '\', this)" onclick="actionAppFrame(\'' + section.namespace + '\')">' + section.label + '<span class="more-section">></span></a>');
           else
-            cmpSec.append('<a onmouseover="subSectionAppFrame(\'' + section.namespace + '\', this)" onclick="actionAppFrame(\'' + section.namespace + '\')">' + section.label + '</a>');
+            cmpSec.append('<a id="frame-' + section.namespace + '"' + disableClass + 'onmouseover="subSectionAppFrame(\'' + section.namespace + '\', this)" onclick="actionAppFrame(\'' + section.namespace + '\')">' + section.label + '</a>');
         });
       });
       cmpSec.css('left', e.target.offsetLeft + 'px');
@@ -155,12 +244,24 @@ function appframeInit(data) {
     core: coreObj,
     objCore: ss,
     action: actionObj,
-    ref: data
+    ref: data,
+    isDisable: isDisable,
+    enable: function(namespace) {
+      isDisable[namespace] = false;
+      $('#frame-' + namespace).removeClass('disable');
+    },
+    disable: function(namespace) {
+      isDisable[namespace] = true;
+      $('#frame-' + namespace).addClass('disable');
+    }
   };
 }
 
 function actionAppFrame(namespace) {
-  appToolbars.action[namespace].action(appToolbars.action[namespace]);
+  if(!appToolbars.isDisable[namespace]) {
+    appToolbars.action[namespace].action(appToolbars.action[namespace]);
+    closeAppFrame();
+  }
 }
 
 function subSectionAppFrame(namespace, obj) {
@@ -176,7 +277,9 @@ function subSectionAppFrame(namespace, obj) {
     $.each(appToolbars.objCore[namespace].subSection, function( index, subSectionVal ) {
       if(index > 0) cmpSec.append('<div class="line"></div>');
       $.each(subSectionVal, function( index, section ) {
-        cmpSec.append('<a onclick="actionAppFrame(\'' + section.namespace + '\')">' + section.label + '</a>');
+        var disableClass = ''
+        if(appToolbars.isDisable[section.namespace]) disableClass = 'class="disable" ';
+        cmpSec.append('<a id="frame-' + section.namespace + '"' + disableClass + 'onclick="actionAppFrame(\'' + section.namespace + '\')">' + section.label + '</a>');
       });
     });
     cmpSec.css({
@@ -197,12 +300,102 @@ function closeAppFrame(obj) {
     isFrameOpen = false;
     isSecFrameOpen = false;
     $('#app-frame button').removeClass('active');
-    if($('.overay').length > 0) $('.overay').css('animation', 'fadeOut .25s forwards');
+    if($('#ov-Frame').length > 0) $('#ov-Frame').css('animation', 'fadeOut .25s forwards');
     if($('.frame-section').length > 0) $('.frame-section').css('animation', 'fadeOut .25s forwards');
     setTimeout(() => {
       if($('.frame-section').length > 0) $('.frame-section').remove();
-      if($('.overay').length > 0) $('.overay').remove();
+      if($('#ov-Frame').length > 0) $('#ov-Frame').remove();
     }, 250);
+  }
+}
+
+function setToolsDropPanel(event, obj) {
+  if(isTDP == false) {
+    isTDP = true;
+    $(event).addClass('active');
+    var cmpTDP = $(components.toolsDropPanel);
+    cmpTDP.css({
+      left: $(event)[0].offsetLeft + 'px',
+      minWidth: ($(event).width() + 22) + 'px'
+    });
+    $.each(obj, function( index, subSectionVal ) {
+      cmpTDP.append('<h4>' + subSectionVal.label + '</h4>');
+      $.each(subSectionVal.projects, function( index, section ) {
+        var icc = '';
+        if(section.icon)
+          icc = section.icon
+        else if(subSectionVal.icon)
+          icc = subSectionVal.icon
+
+        if(index == 0)
+          cmpTDP.append('<a class="active" onclick="' + subSectionVal.fnName + '(\'' + section.namespace + '\', this)">'+ icc + ' ' + section.label + '</a>');
+        else
+          cmpTDP.append('<a onclick="' + subSectionVal.fnName + '(\'' + section.namespace + '\', this)">'+ icc + ' ' + section.label + '</a>');
+      });
+    });
+    if($('#ov-dropPanel').length < 1) $('#app-contentArea').prepend('<div id="ov-dropPanel" class="overay" style="top: 50px;"onclick="closeToolsDropPanel()"></div>');
+    $('#app-contentArea').prepend(cmpTDP[0].outerHTML);
+    $('.arrow-right .down', event).hide();
+    $('.arrow-right .up', event).css('display', 'block');
+  } else {
+    closeToolsDropPanel();
+  }
+}
+
+function closeToolsDropPanel(obj) {
+  if(isTDP == true && obj == undefined) {
+    isTDP = false;
+    $('.panel-tab-option').removeClass('active');
+    if($('#ov-dropPanel').length > 0) $('#ov-dropPanel').css('animation', 'fadeOut .25s forwards');
+    if($('.tools-drop-panel').length > 0) $('.tools-drop-panel').css('animation', 'fadeOut .25s forwards');
+    setTimeout(() => {
+      if($('.tools-drop-panel').length > 0) $('.tools-drop-panel').remove();
+      if($('#ov-dropPanel').length > 0) $('#ov-dropPanel').remove();
+    }, 250);
+  } else if(isTDP == true && obj.skip == true){
+    isTDP = false;
+    $('.panel-tab-option').removeClass('active');
+    if($('.tools-drop-panel').length > 0) $('.tools-drop-panel').remove();
+    if($('#ov-dropPanel').length > 0) $('#ov-dropPanel').remove();
+  }
+  $('.arrow-right .up').hide();
+  $('.arrow-right .down').css('display', 'block');
+}
+
+function toggleSideMenu() {
+  if($('#side-menu').hasClass('active') == true) {
+    $('#side-menu').removeClass('active');
+    if($('#ov-sideMenu').length > 0) $('#ov-sideMenu').css('animation', 'fadeOut .25s forwards');
+    setTimeout(() => {
+      if($('#ov-sideMenu').length > 0) $('#ov-sideMenu').remove();
+    }, 250);
+  } else {
+    if($('#ov-sideMenu').length < 1) $('#app-contentArea').prepend('<div id="ov-sideMenu" style="z-index: 700;" class="overay" onclick="toggleSideMenu()"></div>');
+    $('#side-menu').addClass('active');
+  }
+}
+
+var sideCrrPage = 'dashboard';
+function sideMenuHandle(target, event) {
+  if(target != sideCrrPage) {
+    loadComponent('./page/' + target ,'#pageArea', function() {
+      if(target == "datasets")
+        $('#tab-option-labelGroup').css('display', 'flex');
+      else
+        $('#tab-option-labelGroup').css('display', '');
+      sideCrrPage = target;
+      $('#side-menu .menu-area a').removeClass('active');
+      if(event) {
+        $(event).addClass('active');
+        toggleSideMenu();
+      } else {
+        $('#side-menu .menu-area a[pg-navi="' + target + '"]').addClass('active');
+      }
+      if($("#pageDatasets").length < 1) $("#pageDatasets").off();
+      if($("#pageCroping").length > 0 && event) setTimeout(() => {
+        imgCropSelect(0);
+      }, 50);
+    });
   }
 }
 
@@ -212,6 +405,21 @@ function addhttp(url) {
   }
   return url;
 }
+
+function fileUrl(str) {
+  if (typeof str !== 'string') {
+      throw new Error('Expected a string');
+  }
+
+  var pathName = path.resolve(str).replace(/\\/g, '/');
+
+  // Windows drive letter must be prefixed with a slash
+  if (pathName[0] !== '/') {
+      pathName = '/' + pathName;
+  }
+
+  return encodeURI('file://' + pathName);
+};
 
 function keepLog(objLog) {
   console.log(objLog);

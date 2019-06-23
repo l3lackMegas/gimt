@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "electron-dl": "^1.14.0",
-    "electron-window-state": "^5.0.3"
+    "electron-window-state": "^5.0.3",
+    "fs-extra": "^8.0.1"
   }
 }

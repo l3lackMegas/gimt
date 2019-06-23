@@ -3,6 +3,7 @@ const remote = require('electron').remote;
 const shell = require('electron').shell;
 const ipcRenderer  = require('electron').ipcRenderer;
 const { exec } = require('child_process');
+const path = require('path');
 const _componentOption = {
   path: '',
   ext: '.html'
