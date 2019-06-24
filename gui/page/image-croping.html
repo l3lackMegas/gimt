@@ -29,7 +29,7 @@
             <ul>
                 <script>
                     $('#list-queue-image ul').html('');
-                    $.each(_U.solution.dataset, function( index, value ) {
+                    $.each(getDatasets(_U.project.state.groupSelected), function( index, value ) {
                         $('#list-queue-image ul').append('<li onclick="imgCropSelect( ' + index + ', this)"><a>' + value.filename + '</a></li>');
                     });
                 </script>

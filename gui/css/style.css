@@ -13,17 +13,21 @@
     -moz-user-select: none;
     -o-user-select: none;
     user-select: none;
+    outline-color: rgba(255, 255, 255, .4);
 }
 
 :root {
     --bg-main: #374042;
     --bg-work-area: #2c3435;
+    --bg-overay: rgba(0, 0, 0, .4);
     --font-family-sans-serif: sans-serif;
     --font-family-kanit: 'Kanit', sans-serif;
     --font-family-monospace: monospace;
     --font-size: 13.33px;
+    --font-color: #d4d4d4;
     --border-color: #007a99;
     --border-color-traning: #c55200;
+    --padding-space: 1em;
 }
 
 /* width */
@@ -63,7 +67,7 @@ html,body {
     background-color: var(--bg-main);
     overflow: hidden;
     font-family: var(--font-family-sans-serif);
-    color: #d4d4d4;
+    color: var(--font-color);
 }
 
 body {
@@ -248,6 +252,125 @@ h1, h2, h3, h4, p, ul {
     animation: fadeIn .5s;
 }
 
+#modalBackdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-overay);
+    z-index: 1000000;
+    animation: fadeIn .25s;
+}
+
+#modalBackdrop .contain {
+    width: 100%;
+    height: 100%;
+    animation: bounceIn .35s;
+}
+
+#modalBackdrop .contain dialog {
+    padding: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    min-width: 380px;
+    background-color: #363b3c;
+    color: var(--font-color);
+    font-size: 15px;
+    border: 1px #646d6f solid;
+    border-radius: 2px;
+}
+
+#modalBackdrop .contain dialog .dialog-header {
+    padding: var(--padding-space);
+    border-bottom: 1px #646d6f solid;
+}
+
+#modalBackdrop .contain dialog .dialog-header .a-exit {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-family: cursive;
+    transform: translate(-15px, 12px);
+    cursor: pointer;
+}
+
+#modalBackdrop .contain dialog .dialog-header .a-exit:hover {
+    color: aliceblue;
+}
+
+#modalBackdrop .contain dialog .dialog-content {
+    padding: var(--padding-space);
+    border-bottom: 1px #646d6f solid;
+}
+
+#modalBackdrop .contain dialog .dialog-content p {
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+#modalBackdrop .contain dialog .dialog-content input[type="text"] {
+    margin-bottom: 8px;
+    width: 100%;
+    padding: 5px 10px;
+    background-color: rgba(255,255,255, .1);
+    color: var(--font-color);
+    border: 1px #5d5d5d solid;
+    transition-duration: .25s;
+    cursor: text;
+    border-radius: 4px;
+}
+
+#modalBackdrop .contain dialog .dialog-footer {
+    padding: var(--padding-space);
+    text-align: right;
+}
+
+#modalBackdrop .contain dialog .dialog-footer button {
+    padding: 5px 15px;
+    min-width: 100px;
+    background-color: rgba(255,255,255, .1);
+    color: var(--font-color);
+    border: 1px #5d5d5d solid;
+    border-radius: 3px;
+    transition-duration: .25s;
+}
+
+#modalBackdrop .contain dialog .dialog-footer .loadingIcon {
+    display: none;
+    float: left;
+    transform: translateY(5px);
+}
+#modalBackdrop .contain dialog .dialog-footer .loadingIcon span {
+    font-size: 13px;
+    margin-left: 7px;
+}
+
+#modalBackdrop .contain dialog .dialog-footer button:hover, #modalBackdrop .contain dialog .dialog-content input:hover{
+    background-color: rgba(255,255,255, .15);
+}
+
+#modalBackdrop .contain dialog .dialog-footer button:active, #modalBackdrop .contain dialog .dialog-content input:active {
+    transition-duration: 0s;
+    background-color: rgba(255,255,255, .2);
+}
+
+#modalBackdrop .contain dialog .dialog-footer button:disabled, #modalBackdrop .contain dialog .dialog-content input:disabled {
+    background-color: rgba(255,255,255, .05);
+    border: 1px #444444 solid;
+    color: #b5b5b5;
+    cursor: default;
+}
+
+#modalBackdrop .clsDislog {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
 .frame-section {
     position: absolute;
     padding: 5px 0;
@@ -296,7 +419,7 @@ h1, h2, h3, h4, p, ul {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,.4);
+    background-color: var(--bg-overay);
     z-index: 500;
     animation: fadeIn .25s forwards;
 }
@@ -322,7 +445,6 @@ h1, h2, h3, h4, p, ul {
 }
 
 #btn-main-menu:active {
-    transition-duration: .25s;
     background-color: rgba(255, 255, 255, .3)
 }
 
@@ -333,7 +455,7 @@ h1, h2, h3, h4, p, ul {
 }
 
 #tab-option-labelGroup {
-    display: none;
+    width: 199px;
 }
 
 .panel-tab-option {
@@ -353,7 +475,12 @@ h1, h2, h3, h4, p, ul {
 }
 
 .panel-tab-option h3 {
+    width: 100%;
     color: white;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
     transition-duration: .25s;
 }
 
@@ -365,6 +492,7 @@ h1, h2, h3, h4, p, ul {
 
 .panel-tab-option .detailArea {
     margin-right: 40px;
+    width: calc(100% - 60px);
 }
 
 .panel-tab-option.active {
@@ -448,7 +576,7 @@ h1, h2, h3, h4, p, ul {
     padding: 5px;
     top: 49px;
     left: 54px;
-    min-width: 200px;   
+    max-height: 500px;
     font-size: 15px;
     color: rgba(68, 68, 68, 0.85);
     background-color: white;
@@ -458,14 +586,94 @@ h1, h2, h3, h4, p, ul {
     z-index: 600;
 }
 
+.tools-drop-panel .areaAction {
+    max-height: 455px;
+    overflow: auto;
+ }
+
+.tools-drop-panel .areaAction::-webkit-scrollbar {
+    width: 7px;
+    height: 13px;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.12);
+    transition-duration: 1s;
+}
+
+.tools-drop-panel .areaAction::-webkit-scrollbar-thumb {
+    background-color: rgba(23, 23, 23, 0.2);
+    border-radius: 4px;
+}
+
+.tools-drop-panel .areaAction::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(23, 23, 23, 0.3);
+    border-radius: 4px;
+}
+
+.tools-drop-panel .areaAction::-webkit-scrollbar-thumb:active {
+    background-color: rgba(23, 23, 23, 0.4);
+    border-radius: 4px;
+}
+
 .tools-drop-panel h4 {
     border-top: 1px #ccc solid;
-    padding-top: 5px;
+    padding: 5px 0 0 5px;
+    line-height: 25px;
+    margin-bottom: 5px;
+}
+
+.tools-drop-panel h4 button {
+    float: right;
+    padding: 4px 15px;
+    background-color: #f7f7f7;
+    border: 1px #e8e8e8 solid;
+    outline: none;
+    transition-duration: .25s;
+    border-radius: 3px;
+}
+
+.tools-drop-panel h4 button:hover {
+    transition-duration: .1s;
+    background-color: #fff;
+    border: 1px #e0e0e0 solid;
+}
+
+.tools-drop-panel h4 button:active {
+    transition-duration: 0s;
+    background-color: #fff;
+    border: 1px #e0e0e0 solid;
+    box-shadow: 0 0 5px -2px #7d7d7d;
 }
 
 .tools-drop-panel a {
-    display: block;
+    display: flex;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.tools-drop-panel a span {
     padding: 5px 10px;
+    width: 100%;
+}
+
+.tools-drop-panel a button {
+    display: none;
+    float: right;
+    padding: 1px 5px;
+    border: none;
+    background-color: transparent;
+    color: inherit;
+    cursor: pointer;
+    animation: fadeIn .15s;
+}
+
+.tools-drop-panel a button:hover {
+    color: black;
+}
+
+.tools-drop-panel a:hover button  {
+    display: block;
 }
 
 .tools-drop-panel a:hover{

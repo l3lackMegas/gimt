@@ -30,8 +30,7 @@
                         },
                         {
                             namespace: 'add-label',
-                            label: 'New Label',
-                            isDisable: true,
+                            label: 'New Label Group',
                             action: function(data) {
                                 alert(data.label + ' Clicked!');
                             }
@@ -157,6 +156,14 @@
                             action: function (data) {
                                 alert(data.label + ' Clicked!');
                             }
+                        },
+                        {
+                            namespace: 'edit-label-group',
+                            label: 'Edit Label Group Name',
+                            isDisable: true,
+                            action: function (data) {
+                                alert(data.label + ' Clicked!');
+                            }
                         }
                     ],
                     [
@@ -180,7 +187,7 @@
                             label: 'Start Train',
                             isDisable: true,
                             action: function (data) {
-                                alert(data.label + ' Clicked!');
+                                handleTraining($('#training-panel')[0]);
                             }
                         },
                         {
@@ -188,7 +195,7 @@
                             label: 'Stop Train',
                             isDisable: true,
                             action: function (data) {
-                                alert(data.label + ' Clicked!');
+                                handleTraining($('#training-panel')[0]);
                             }
                         }
                     ],

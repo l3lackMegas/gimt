@@ -2,7 +2,7 @@
     <div id="image-grid-area" class="grid-panel">
         <script>
             $('#image-grid-area').html('');
-            var itemImgDataset = getDatasets();
+            var itemImgDataset = getDatasets(_U.project.state.groupSelected);
             $.each(itemImgDataset, function( index, value ) {
                 $('#image-grid-area').append('<div class="item-box" onclick="openImageCrop(\'' + index + '\');"><div class="img-pv" style="background-image: url(' + fileUrl(_StateTP.projectPath + "\\datasets\\" + value.filename) + ');"></div></div>');
             });
@@ -64,9 +64,10 @@
         // convert to File object, NOTE: we're using binary mime-type for the final Blob/File
         c.toBlob(function(blob) {
             var otDetail = {
-                    id: ("000" + _U.project.order).slice(-4),
-                    filename: ("000" + _U.project.order).slice(-4) + ".jpg",
+                    id: ("000" + _U.project.order.dataset).slice(-4),
+                    filename: ("000" + _U.project.order.dataset).slice(-4) + ".jpg",
                     extension: "image/jpeg",
+                    groupID: findGroupStateSelected('id', _U.project.state.groupSelected, ['id']),
                     size: {
                         width: c.width,
                         height: c.height
@@ -81,7 +82,7 @@
                         }
                     ]
                 };
-            _U.project.order++;
+            _U.project.order.dataset++;
             var file = new File([blob], otDetail.filename, {type: "application/octet-stream"});
             //window.location = URL.createObjectURL(file);
             saveBlob(file, _StateTP.projectPath + "\\datasets\\" + otDetail.filename, otDetail);

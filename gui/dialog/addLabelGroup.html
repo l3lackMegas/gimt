@@ -1,0 +1,15 @@
+<div class="dialog-header">
+    <h4 part="title">Add Label Group</h4>
+    <a class="a-exit" onclick="closeDialog()">X</a>
+</div>
+<div class="dialog-content">
+    <p>Group Name:</p>
+    <input id="lbGroupName" name="label" type="text" onkeyup="labelGroupOnchange()">
+    <p>Namespace:</p>
+    <input id="lbGroupNamespace" name="namespace" type="text" disabled>
+</div>
+<div class="dialog-footer">
+    <p class="loadingIcon"><i class="fas fa-circle-notch fa-spin"></i></p>
+    <button onclick="addLabelGroup()">Add</button>
+    <button onclick="closeDialog()">Cancel</button>
+</div>

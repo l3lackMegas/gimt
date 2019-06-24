@@ -3,6 +3,7 @@ var coreStatus = "ready"
 function handleTraining(event) {
     switch(coreStatus) {
         case "ready" :
+            appToolbars.disable('start-train');
             coreStatus = "preparinig"
             $(event).addClass('disable');
             $('h3', event).html('Starting train')
@@ -18,15 +19,18 @@ function handleTraining(event) {
                 footerStatus('training');
                 coreStatus = "training"
                 $(event).removeClass('disable');
+                appToolbars.enable('stop-train');
             }, 2000);
             break;
 
         case "training" :
+            appToolbars.disable('stop-train');
             coreStatus = "ready"
             $('h3', event).html('Start Train')
             $('p', event).html('with GPU')
             $('svg', event).remove();
             $(event).prepend('<i class="fas fa-play"></i>');
+            appToolbars.enable('start-train');
             footerStatus('available');
             break;
     }
@@ -46,31 +50,26 @@ function optionModule(event) {
             label: 'Model',
             fnName: 'dropModelOpen',
             icon: '<i class="fas fa-cubes"></i>',
-            projects: finalSet
+            button: {
+                name: 'Add',
+                fnName: 'dropModelAdd'
+            },
+            editFnName: 'dropModelEdit',
+            projects: finalSet,
+            currentSelect: _State.lastOpen[0]
         }
     ]);
 }
 
-function optionGroup(event) {
-    var finalSet = [];
-    $.each(_U.solution.label, function( index, value ) {
-        var states = {
-            namespace: value,
-            label: value
-        }
-        finalSet.push(states);
-    });
-    setToolsDropPanel(event, [
-        {
-            label: 'Group',
-            fnName: 'dropGropOpen',
-            icon: '<i class="fas fa-cubes"></i>',
-            projects: finalSet
-        }
-    ]);
+function dropModelAdd(event) {
+
 }
 
-function dropModelOpen(namespace, event) {
+function dropModelEdit(event) {
+
+}
+
+function dropModelOpen(namespace, event, fn) {
     $('.tools-drop-panel a').removeClass('active');
     if(event) $(event).addClass('active');
     var currentLOP = [namespace];
@@ -85,20 +84,228 @@ function dropModelOpen(namespace, event) {
     getStateFilesData(_State.projectsDetail[namespace].path, function(projectData) {
         _U = projectData;
         $('#tab-option-module h3').html(_U.project.title + " - " + _U.project.iterations + " Iterations");
+        $('#tab-option-labelGroup .detailArea h3').html(findGroupStateSelected('id', _U.project.state.groupSelected, ['name']));
         loadComponent('./page/' + sideCrrPage ,'#pageArea', function() {
             if($("#pageCroping").length > 0) setTimeout(() => {
                 imgCropSelect(0);
             }, 50);
             saveProgramStateData();
         });
+        if(fn) fn(_U);
     });
 }
 
-function getDatasets() {
-    var output = [];
-    $.each(_U.solution.dataset, function( index, value ) {
-        output.push(value);
+function findGroupStateSelected(target, value, rtBack) {
+    var rsGST = {},
+        isFound = 0;
+    $.each(_U.solution.group, function(index, groupState) {
+        if(groupState[target] == value) {
+            isFound = 1;
+            if(!rtBack) {
+                rsGST = groupState;
+                rsGST['key'] = index;
+            } else {
+                if(rtBack.length == 1) {
+                    if(rtBack[0] != "key") rsGST = groupState[rtBack[0]]; else rsGST = index;
+                } else {
+                    $.each(rtBack, function(minI, value) {
+                        if(value != "key") rsGST[value] = groupState[value]; else rsGST['key'] = index;
+                    });
+                }
+            }
+            return false;
+        }
     });
+    if(isFound == 0) {
+        var nonState = {
+            id: 0,
+            namespace: "none",
+            name: "Others"
+        }
+        if(_U.project.state.lbGroupAll == true) nonState.name = "No group select";
+        if(!rtBack)
+            return nonState;
+        else {
+            if(rtBack.length == 1) {
+                rsGST = nonState[rtBack[0]];
+            } else {
+                $.each(rtBack, function(index, value) {
+                    rsGST[value] = nonState[target];
+                });
+            }
+        }
+    }
+    return rsGST;
+}
+
+function optionGroup(event, isUpdate) {
+    var finalSet = [
+        {
+            namespace: 'all',
+            label: 'All'
+        }
+    ];
+    $.each(_U.solution.group, function( index, value ) {
+        var states = {
+            namespace: value.namespace,
+            label: value.name
+        }
+        finalSet.push(states);
+    });
+    var states = {
+        namespace: 'none',
+        label: 'Others'
+    }
+    finalSet.push(states);
+    var crDSelect = 'all';
+    if(_U.project.state.lbGroupAll == false) crDSelect = findGroupStateSelected('id', _U.project.state.groupSelected, ['namespace']);
+    if(isUpdate == true) {
+        $('.tools-drop-panel').remove();
+        showToolsDropPanel(event, [
+            {
+                label: 'Group',
+                fnName: 'dropGropOpen',
+                icon: '<i class="far fa-object-ungroup"></i>',
+                button: {
+                    name: 'Add',
+                    fnName: 'dropGroupAdd'
+                },
+                editFnName: 'dropGroupEdit',
+                projects: finalSet,
+                currentSelect: crDSelect
+            }
+        ]);
+    } else {
+        setToolsDropPanel(event, [
+            {
+                label: 'Group',
+                fnName: 'dropGropOpen',
+                icon: '<i class="far fa-object-ungroup"></i>',
+                button: {
+                    name: 'Add',
+                    fnName: 'dropGroupAdd'
+                },
+                editFnName: 'dropGroupEdit',
+                projects: finalSet,
+                currentSelect: crDSelect
+            }
+        ]);
+    }
+    var tgScroll = 0;
+    if(findGroupStateSelected('id', _U.project.state.groupSelected, ['id']) != 0)
+        tgScroll = (27 * findGroupStateSelected('id', _U.project.state.groupSelected, ['id'])) - 127
+    else if(findGroupStateSelected('id', _U.project.state.groupSelected, ['id']) == 0 && _U.project.state.lbGroupAll == true)
+        tgScroll = 0;
+    else
+        tgScroll = (27 * _U.project.order.group) - 127;
+    $(".tools-drop-panel .areaAction").animate({
+        scrollTop: tgScroll
+    }, 750);
+}
+
+function dropGroupAdd(event) {
+    showDialog('addLabelGroup');
+    setTimeout(() => {
+        $('#lbGroupName').focus();
+    }, 250);
+}
+
+function dropGroupEdit(event) {
+    _StateTP.crrEditGroupState = findGroupStateSelected('namespace', $(event).attr('data'), ['id', 'name', 'namespace']);
+    showDialog('editLabelGroup');
+    setTimeout(() => {
+        $('#lbGroupName').focus();
+    }, 250);
+}
+
+function labelGroupOnchange () {
+    $('#lbGroupNamespace').val(converToNamespace($('#lbGroupName').val()));
+}
+
+function addLabelGroup(event) {
+    $('#modalBackdrop .contain dialog .dialog-footer button').prop('disabled', true);
+    $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').html('<i class="fas fa-circle-notch fa-spin"></i><span>Adding label...</span>');
+    $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').fadeIn(100);
+    if($('#lbGroupNamespace').val() != "" && $('#lbGroupNamespace').val() != "none" && $('#lbGroupNamespace').val() != "all" && findGroupStateSelected('namespace', $('#lbGroupNamespace').val(), ['key']) == undefined) {
+        var setGroupState = {
+            id: _U.project.order.group,
+            namespace: $('#lbGroupNamespace').val(),
+            name: $('#lbGroupName').val()
+        };
+        _U.project.order.group++;
+        _U.solution.group.push(setGroupState);
+        saveProjectData();
+        setTimeout(() => {
+            dropGropOpen(findGroupStateSelected('id', setGroupState.id, ['namespace']), null, true);
+            optionGroup($('#tab-option-labelGroup')[0], true);
+            closeDialog()
+        }, 750);
+    } else {
+        $('#modalBackdrop .contain dialog .dialog-footer button').prop('disabled', false);
+        $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').fadeOut(100);
+    }
+}
+
+function editLabelGroup(event) {
+    $('#modalBackdrop .contain dialog .dialog-footer button').prop('disabled', true);
+    $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').html('<i class="fas fa-circle-notch fa-spin"></i><span>Adding label...</span>');
+    $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').fadeIn(100);
+    if(($('#lbGroupNamespace').val() != "" && $('#lbGroupNamespace').val() != "none" && $('#lbGroupNamespace').val() != "all" && findGroupStateSelected('namespace', $('#lbGroupNamespace').val(), ['key']) == undefined) || $('#lbGroupNamespace').val() == _StateTP.crrEditGroupState.namespace) {
+        var setGroupState = {
+            id: _StateTP.crrEditGroupState.id,
+            namespace: $('#lbGroupNamespace').val(),
+            name: $('#lbGroupName').val()
+        };
+        _U.solution.group[findGroupStateSelected('namespace', _StateTP.crrEditGroupState.namespace, ['key'])] = setGroupState;
+        saveProjectData();
+        setTimeout(() => {
+            dropGropOpen(findGroupStateSelected('id', setGroupState.id, ['namespace']), null, true);
+            optionGroup($('#tab-option-labelGroup')[0], true);
+            closeDialog()
+        }, 750);
+    } else {
+        $('#modalBackdrop .contain dialog .dialog-footer button').prop('disabled', false);
+        $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').fadeOut(100);
+    }
+}
+
+function deleteLabelGroup(event) {
+    _U.solution.group[findGroupStateSelected('namespace', _StateTP.crrEditGroupState.namespace, ['key'])] = null;
+    var newGroupState = []
+    $.each(_U.solution.group, function(index, obj) {
+        if(obj != null) newGroupState.push(obj);
+    });
+    _U.solution.group = newGroupState;
+    saveProjectData();
+}
+
+function dropGropOpen(namespace, event, isNotCls) {
+    if(namespace == 'all') _U.project.state.lbGroupAll = true; else _U.project.state.lbGroupAll = false;
+
+    _U.project.state.groupSelected = findGroupStateSelected('namespace', namespace, ['id']);
+    $('#tab-option-labelGroup .detailArea h3').html(findGroupStateSelected('id', _U.project.state.groupSelected, ['name']));
+    if(isNotCls != true) closeToolsDropPanel();
+    saveProjectData();
+    loadComponent('./page/' + sideCrrPage ,'#pageArea', function() {
+        if($("#pageCroping").length > 0) setTimeout(() => {
+            imgCropSelect(0);
+        }, 50);
+    });
+}
+
+function getDatasets(tGroupID) {
+    var output = [];
+    if(tGroupID == undefined || _U.project.state.lbGroupAll == true) {
+        $.each(_U.solution.dataset, function( index, value ) {
+            output.push(value);
+        });
+    } else {
+        $.each(_U.solution.dataset, function(index, datasetState) {
+            if(datasetState.groupID == tGroupID) {
+                output.push(datasetState);
+            }
+        });
+    }
     return output;
 }
 
@@ -106,7 +313,7 @@ ipcRenderer.on('SAVED_FILE', (event, path, obj) => {
     console.log("Saved file " + path);
     _U.solution.dataset.push(obj);
     saveProjectData();
-    $('#image-grid-area').append('<div class="item-box" onclick="openImageCrop(\'' + (_U.solution.dataset.length - 1) + '\');"><div class="img-pv" style="background-image: url(' + fileUrl(path) + ');"></div></div>')
+    $('#image-grid-area').append('<div class="item-box" onclick="openImageCrop(\'' + (getDatasets(_U.project.state.groupSelected).length - 1) + '\');"><div class="img-pv" style="background-image: url(' + fileUrl(path) + ');"></div></div>')
 })
 
 function imgCropSelect(target) {
@@ -114,14 +321,14 @@ function imgCropSelect(target) {
     $($('#list-queue-image ul li')[target]).addClass('active');
     resetImgCropPositionControl();
     $('#exampleIMG').css({
-        width: _U.solution.dataset[target].size.width + 'px',
-        height:  _U.solution.dataset[target].size.height + 'px'
+        width: getDatasets(_U.project.state.groupSelected)[target].size.width + 'px',
+        height:  getDatasets(_U.project.state.groupSelected)[target].size.height + 'px'
     });
     $("#list-queue-image ul").animate({
         scrollTop: (21 * target) - 126
     }, 250);
     console.log($($('#list-queue-image ul li')[target])[0].offsetTop - 40)
-    $('#exampleIMG img')[0].src = fileUrl(_StateTP.projectPath + "\\datasets\\" + _U.solution.dataset[target].filename);
+    $('#exampleIMG img')[0].src = fileUrl(_StateTP.projectPath + "\\datasets\\" + getDatasets(_U.project.state.groupSelected)[target].filename);
     $('#exampleIMG').attr('target', target)
 }
 

@@ -38,9 +38,9 @@
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    transition-duration: .5s;
+    transition-duration: .75s;
 }
 
 #pageDatasets .grid-panel .item-box .img-pv:hover {
-    transform: scale(1.15);
+    transform: scale(1.1);
 }
