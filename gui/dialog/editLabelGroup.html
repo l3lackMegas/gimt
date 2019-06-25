@@ -1,4 +1,4 @@
-<div class="dialog-header">
+<div class="dialog-header" style="width: 500px;">
     <h4 part="title">Edit Label Group</h4>
     <a class="a-exit" onclick="closeDialog()">X</a>
 </div>
@@ -10,8 +10,8 @@
 </div>
 <div class="dialog-footer">
     <p class="loadingIcon"></p>
-    <button onclick="deleteLabelGroup()">Delete</button>
-    <button onclick="editLabelGroup()">Edit</button>
+    <button class="red" style="float: left;" onclick="deleteLabelGroup(this)">Delete</button>
+    <button onclick="editLabelGroup(this)">Edit</button>
     <button onclick="closeDialog()">Cancel</button>
 </div>
 <script>

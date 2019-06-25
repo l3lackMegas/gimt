@@ -351,8 +351,8 @@ function showToolsDropPanel(event, obj) {
       else if(subSectionVal.icon)
         icc = subSectionVal.icon
 
-      var editBTN;
-      if(subSectionVal.editFnName) editBTN = '<button data="' + section.namespace + '" onclick="' + subSectionVal.editFnName + '(this)"><i class="fas fa-edit"></i></button>';
+      var editBTN = '';
+      if(subSectionVal.editFnName && section.noEdit != true) editBTN = '<button data="' + section.namespace + '" onclick="' + subSectionVal.editFnName + '(this)"><i class="fas fa-edit"></i></button>';
 
       if(section.namespace == subSectionVal.currentSelect)
         $('.areaAction', cmpTDP).append('<a class="active"><span onclick="' + subSectionVal.fnName + '(\'' + section.namespace + '\', this)">'+ icc + ' ' + section.label + '</span>' + editBTN + '</a>');
@@ -457,7 +457,7 @@ function fileUrl(str) {
   }
 
   return encodeURI('file://' + pathName);
-};
+}
 
 function converToNamespace(str) {
   if(str) {

@@ -4,6 +4,7 @@
         <meta charset="UTF-8">
         <title>GUI Image Model-training</title>
         <link rel="stylesheet" type="text/css" href="./css/style.css">
+        <link rel="stylesheet" type="text/css" href="./css/wasumi-msg-dialog.css">
         <link rel="stylesheet" type="text/css" href="./platform/css/platform-windows.css">
         <link rel="stylesheet" type="text/css" href="./css/pages.css">
 
@@ -13,12 +14,20 @@
         <!-- normal script imports etc  -->
         <script src="./js/jquery.min.js"></script>
         <script src="./platform/js/platform-windows.js"></script>
+        <script src="./js/wasumi-msg-dialog.js"></script>
         <script src="./js/index.js"></script>
         <script src="./js/handle.js"></script>
         <script defer src="https://use.fontawesome.com/releases/v5.6.3/js/all.js" integrity="sha384-EIHISlAOj4zgYieurP0SdoiBYfGJKkgWedPHH4jCzpCXLmzVsw1ouK59MuUtP4a1" crossorigin="anonymous"></script>
 
         <!-- Insert this line after script imports -->
-        <script>if (window.module) module = window.module;</script>
+        <script>
+            if (window.module) module = window.module;
+            const wasumiMessage = wasuInit({
+                element: 'body',
+                animation: 'zoomIn',
+                animationDuration: '.25s'
+            });
+        </script>
     </head>
     <body onload="loadFunction();">
         <div id="app-titleBar">

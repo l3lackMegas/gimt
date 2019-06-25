@@ -142,7 +142,8 @@ function optionGroup(event, isUpdate) {
     var finalSet = [
         {
             namespace: 'all',
-            label: 'All'
+            label: 'All',
+            noEdit: true
         }
     ];
     $.each(_U.solution.group, function( index, value ) {
@@ -154,7 +155,8 @@ function optionGroup(event, isUpdate) {
     });
     var states = {
         namespace: 'none',
-        label: 'Others'
+        label: 'Others',
+        noEdit: true
     }
     finalSet.push(states);
     var crDSelect = 'all';
@@ -223,6 +225,7 @@ function labelGroupOnchange () {
 }
 
 function addLabelGroup(event) {
+    $('#dialog .dialog-footer button[style="float: left;"]').hide();
     $('#modalBackdrop .contain dialog .dialog-footer button').prop('disabled', true);
     $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').html('<i class="fas fa-circle-notch fa-spin"></i><span>Adding label...</span>');
     $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').fadeIn(100);
@@ -247,8 +250,9 @@ function addLabelGroup(event) {
 }
 
 function editLabelGroup(event) {
+    $('#dialog .dialog-footer button[style="float: left;"]').hide();
     $('#modalBackdrop .contain dialog .dialog-footer button').prop('disabled', true);
-    $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').html('<i class="fas fa-circle-notch fa-spin"></i><span>Adding label...</span>');
+    $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').html('<i class="fas fa-circle-notch fa-spin"></i><span>Editing label...</span>');
     $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').fadeIn(100);
     if(($('#lbGroupNamespace').val() != "" && $('#lbGroupNamespace').val() != "none" && $('#lbGroupNamespace').val() != "all" && findGroupStateSelected('namespace', $('#lbGroupNamespace').val(), ['key']) == undefined) || $('#lbGroupNamespace').val() == _StateTP.crrEditGroupState.namespace) {
         var setGroupState = {
@@ -270,13 +274,56 @@ function editLabelGroup(event) {
 }
 
 function deleteLabelGroup(event) {
-    _U.solution.group[findGroupStateSelected('namespace', _StateTP.crrEditGroupState.namespace, ['key'])] = null;
-    var newGroupState = []
-    $.each(_U.solution.group, function(index, obj) {
-        if(obj != null) newGroupState.push(obj);
-    });
-    _U.solution.group = newGroupState;
-    saveProjectData();
+    var isConfirm = false;
+    $('#dialog .dialog-footer button[style="float: left;"]').hide();
+    $('#modalBackdrop .contain dialog .dialog-footer button').prop('disabled', true);
+    $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').html('<i class="fas fa-circle-notch fa-spin"></i><span>Confirming action...</span>');
+    $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').fadeIn(100);
+    wasumiMessage.openMsg('The "' + findGroupStateSelected('namespace', _StateTP.crrEditGroupState.namespace, ['name']) + '" group will disappear forever.\nAre you sure you want to delete this Group?', 'Warning! please confirm your action.', 'warning', {
+        addButton: [
+            {namespace: 'delete', text: 'Delete'},
+        ],
+        option: ['delete', 'cancel'],
+        fn: {
+            delete: function() {
+                isConfirm = true;
+                $('#dialog .dialog-footer button[style="float: left;"]').hide();
+                $('#modalBackdrop .contain dialog .dialog-footer button').prop('disabled', true);
+                $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').html('<i class="fas fa-circle-notch fa-spin"></i><span>Deleting label...</span>');
+                $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').fadeIn(100);
+                var groupState = findGroupStateSelected('namespace', _StateTP.crrEditGroupState.namespace, ['id', 'key']);
+                _U.solution.group[groupState.key] = null;
+                var newGroupState = [],
+                    newDatasetState = []
+                $.each(_U.solution.group, function(index, obj) {
+                    if(obj != null) newGroupState.push(obj);
+                });
+                _U.solution.group = newGroupState;
+
+                $.each(_U.solution.dataset, function(index, obj) {
+                    if(obj.groupID == groupState.id) {
+                        obj.groupID = 0;
+                    }
+                    newDatasetState.push(obj);
+                });
+                _U.solution.dataset = newDatasetState;
+                saveProjectData();
+                setTimeout(() => {
+                    if(_U.project.state.groupSelected == groupState.id) dropGropOpen('all', null, true);
+                    optionGroup($('#tab-option-labelGroup')[0], true);
+                    closeDialog()
+                }, 500);
+            }
+        }
+    }).afterClose(function() {
+        setTimeout(() => {
+            if(isConfirm == false) {
+                $(event).fadeIn(100);
+                $('#modalBackdrop .contain dialog .dialog-footer button').prop('disabled', false);
+                $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').hide();
+            }
+        }, 50);
+    })
 }
 
 function dropGropOpen(namespace, event, isNotCls) {
@@ -380,11 +427,12 @@ function imgCropPositionControl(cTarget) {
             $('#exampleIMG').css({
                 transform: 'translateY(' + imgCropExamPosition.top + '%) translateX(' + imgCropExamPosition.left + '%) scale(' + imgCropExamPosition.scale + ')'
             });
-            $('#imgPositionControl').scrollTop();
-            $('#imgPositionControl').stop().animate({
+            $('#imgPositionControl').scrollTop($('#imgPositionControl').scrollTop() + (($('#imgPositionControl')[0].scrollHeight / 100) * 25) / (imgCropExamPosition.scale));
+            $('#imgPositionControl').scrollLeft($('#imgPositionControl').scrollLeft() + (($('#imgPositionControl')[0].scrollWidth / 100) * 25) / (imgCropExamPosition.scale))
+            /*$('#imgPositionControl').stop().animate({
                 scrollTop: ($('#imgPositionControl').scrollTop() + (($('#imgPositionControl')[0].scrollHeight / 100) * 25) / (imgCropExamPosition.scale)),
                 scrollLeft: ($('#imgPositionControl').scrollLeft() + (($('#imgPositionControl')[0].scrollWidth / 100) * 25) / (imgCropExamPosition.scale))
-            }, 200);
+            }, 200);*/
             break;
 
         case 'zoomOut':
@@ -400,11 +448,12 @@ function imgCropPositionControl(cTarget) {
                 $('#exampleIMG').css({
                     transform: 'translateY(' + imgCropExamPosition.top + '%) translateX(' + imgCropExamPosition.left + '%) scale(' + imgCropExamPosition.scale + ')'
                 });
-                $('#imgPositionControl').scrollTop();
-                $('#imgPositionControl').stop().animate({
+                $('#imgPositionControl').scrollTop($('#imgPositionControl').scrollTop() - (($('#imgPositionControl')[0].scrollHeight / 100) * 25) / (imgCropExamPosition.scale));
+                $('#imgPositionControl').scrollLeft($('#imgPositionControl').scrollLeft() - (($('#imgPositionControl')[0].scrollWidth / 100) * 25) / (imgCropExamPosition.scale));
+                /*$('#imgPositionControl').stop().animate({
                     scrollTop: ($('#imgPositionControl').scrollTop() - (($('#imgPositionControl')[0].scrollHeight / 100) * 25) / (imgCropExamPosition.scale)),
                     scrollLeft: ($('#imgPositionControl').scrollLeft() - (($('#imgPositionControl')[0].scrollWidth / 100) * 25) / (imgCropExamPosition.scale))
-                }, 200);
+                }, 200);*/
             }
             break;
     
