@@ -225,11 +225,11 @@ function labelGroupOnchange () {
 }
 
 function addLabelGroup(event) {
-    $('#dialog .dialog-footer button[style="float: left;"]').hide();
-    $('#modalBackdrop .contain dialog .dialog-footer button').prop('disabled', true);
-    $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').html('<i class="fas fa-circle-notch fa-spin"></i><span>Adding label...</span>');
-    $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').fadeIn(100);
     if($('#lbGroupNamespace').val() != "" && $('#lbGroupNamespace').val() != "none" && $('#lbGroupNamespace').val() != "all" && findGroupStateSelected('namespace', $('#lbGroupNamespace').val(), ['key']) == undefined) {
+        $('#dialog .dialog-footer button[style="float: left;"]').hide();
+        $('#modalBackdrop .contain dialog .dialog-footer button').prop('disabled', true);
+        $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').html('<i class="fas fa-circle-notch fa-spin"></i><span>Adding label...</span>');
+        $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').fadeIn(100);
         var setGroupState = {
             id: _U.project.order.group,
             namespace: $('#lbGroupNamespace').val(),
@@ -327,17 +327,37 @@ function deleteLabelGroup(event) {
 }
 
 function dropGropOpen(namespace, event, isNotCls) {
-    if(namespace == 'all') _U.project.state.lbGroupAll = true; else _U.project.state.lbGroupAll = false;
-
-    _U.project.state.groupSelected = findGroupStateSelected('namespace', namespace, ['id']);
-    $('#tab-option-labelGroup .detailArea h3').html(findGroupStateSelected('id', _U.project.state.groupSelected, ['name']));
-    if(isNotCls != true) closeToolsDropPanel();
-    saveProjectData();
-    loadComponent('./page/' + sideCrrPage ,'#pageArea', function() {
-        if($("#pageCroping").length > 0) setTimeout(() => {
-            imgCropSelect(0);
-        }, 50);
-    });
+    var isSPName = '';
+    if(findGroupStateSelected('id', _U.project.state.groupSelected, ['namespace']) == "none" && _U.project.state.lbGroupAll == true) {
+        isSPName = 'all';
+    } else if(findGroupStateSelected('id', _U.project.state.groupSelected, ['namespace']) == "none" && _U.project.state.lbGroupAll == false) {
+        isSPName = 'none'
+    }
+    console.log(namespace, findGroupStateSelected('id', _U.project.state.groupSelected, ['namespace']), namespace != findGroupStateSelected('id', _U.project.state.groupSelected, ['namespace']))
+    console.log((namespace != findGroupStateSelected('id', _U.project.state.groupSelected, ['namespace']) && namespace != "none" && namespace != "all"))
+    if(namespace != findGroupStateSelected('id', _U.project.state.groupSelected, ['namespace']) && namespace != "none" && namespace != "all") {
+        if(namespace == 'all') _U.project.state.lbGroupAll = true; else _U.project.state.lbGroupAll = false;
+        _U.project.state.groupSelected = findGroupStateSelected('namespace', namespace, ['id']);
+        $('#tab-option-labelGroup .detailArea h3').html(findGroupStateSelected('id', _U.project.state.groupSelected, ['name']));
+        if(isNotCls != true) closeToolsDropPanel();
+        saveProjectData();
+        loadComponent('./page/' + sideCrrPage ,'#pageArea', function() {
+            if($("#pageCroping").length > 0) setTimeout(() => {
+                imgCropSelect(0);
+            }, 50);
+        });
+    } else if (namespace != isSPName && (namespace == "none" || namespace == "all")) {
+        if(namespace == 'all') _U.project.state.lbGroupAll = true; else _U.project.state.lbGroupAll = false;
+        _U.project.state.groupSelected = findGroupStateSelected('namespace', namespace, ['id']);
+        $('#tab-option-labelGroup .detailArea h3').html(findGroupStateSelected('id', _U.project.state.groupSelected, ['name']));
+        if(isNotCls != true) closeToolsDropPanel();
+        saveProjectData();
+        loadComponent('./page/' + sideCrrPage ,'#pageArea', function() {
+            if($("#pageCroping").length > 0) setTimeout(() => {
+                imgCropSelect(0);
+            }, 50);
+        });
+    }
 }
 
 function getDatasets(tGroupID) {
@@ -367,15 +387,14 @@ function imgCropSelect(target) {
     $('#list-queue-image ul li').removeClass('active');
     $($('#list-queue-image ul li')[target]).addClass('active');
     resetImgCropPositionControl();
+    $('#exampleIMG img')[0].src = fileUrl(_StateTP.projectPath + "\\datasets\\" + getDatasets(_U.project.state.groupSelected)[target].filename);
     $('#exampleIMG').css({
-        width: getDatasets(_U.project.state.groupSelected)[target].size.width + 'px',
-        height:  getDatasets(_U.project.state.groupSelected)[target].size.height + 'px'
+        width: getDatasets(_U.project.state.groupSelected)[target].size.width + 'px'
     });
     $("#list-queue-image ul").animate({
-        scrollTop: (21 * target) - 126
+        scrollTop: (27 * target) - 126
     }, 250);
-    console.log($($('#list-queue-image ul li')[target])[0].offsetTop - 40)
-    $('#exampleIMG img')[0].src = fileUrl(_StateTP.projectPath + "\\datasets\\" + getDatasets(_U.project.state.groupSelected)[target].filename);
+    //console.log($($('#list-queue-image ul li')[target])[0].offsetTop - 40)
     $('#exampleIMG').attr('target', target)
 }
 
@@ -409,7 +428,8 @@ function resetImgCropPositionControl() {
     $('#exampleIMG').css({
         top: '50%',
         left: '50%',
-        transform: 'translateY(' + imgCropExamPosition.top + '%) translateX(' + imgCropExamPosition.left + '%) scale(' + imgCropExamPosition.scale + ')'
+        transform: 'translateY(' + imgCropExamPosition.top + '%) translateX(' + imgCropExamPosition.left + '%) scale(' + imgCropExamPosition.scale + ')',
+        maxHeight: ''
     })
 }
 
@@ -433,6 +453,8 @@ function imgCropPositionControl(cTarget) {
                 scrollTop: ($('#imgPositionControl').scrollTop() + (($('#imgPositionControl')[0].scrollHeight / 100) * 25) / (imgCropExamPosition.scale)),
                 scrollLeft: ($('#imgPositionControl').scrollLeft() + (($('#imgPositionControl')[0].scrollWidth / 100) * 25) / (imgCropExamPosition.scale))
             }, 200);*/
+            if(imgCropExamPosition.scale >= 1) $('#exampleIMG').css('max-height', '');
+                    
             break;
 
         case 'zoomOut':
@@ -454,6 +476,7 @@ function imgCropPositionControl(cTarget) {
                     scrollTop: ($('#imgPositionControl').scrollTop() - (($('#imgPositionControl')[0].scrollHeight / 100) * 25) / (imgCropExamPosition.scale)),
                     scrollLeft: ($('#imgPositionControl').scrollLeft() - (($('#imgPositionControl')[0].scrollWidth / 100) * 25) / (imgCropExamPosition.scale))
                 }, 200);*/
+                if(imgCropExamPosition.scale < 1) $('#exampleIMG').css('max-height', 'unset');
             }
             break;
     
