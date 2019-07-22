@@ -75,7 +75,7 @@ body {
     background-position: center;
     background-size: 250px;
     background-repeat: no-repeat;
-    animation: fadeIn .25s;
+    animation: fadeIn .5s;
 }
 
 h1, h2, h3, h4, p, ul {
@@ -194,7 +194,8 @@ h1, h2, h3, h4, p, ul {
     color: rgba(255, 255, 255, 0.74);
     border: none;
     outline: none;
-    animation: fadeIn .25s;
+    opacity: 0;
+    animation: fadeIn .5s forwards;
     transition-duration: .25s;
 }
 

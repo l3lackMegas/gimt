@@ -25,14 +25,13 @@ var _State = {},
 var autoSaveState;
 
 function loadFunction() {
+  footerStatus('preparing', 'Loading State...');
   setTimeout(() => {
-    footerStatus('preparing', 'Loading State...');
     getStateFilesData(getSiteGlobal('Site').startPath + '\\state.json', function(stateData) {
       _State = stateData;
-      loadComponent('./component/appFrame' ,'#app-frame', function() {
-        setTimeout(() => {
-          footerStatus('preparing', 'Loading GUI...');
-          setTimeout(() => {
+      footerStatus('preparing', 'Loading GUI...');
+      setTimeout(() => {
+        loadComponent('./component/appFrame' ,'#app-frame', function() {
             $('#app-contentArea').show();
             var argPathProject = '';
             if(fs.existsSync(remote.process.argv[1]) == true && remote.process.argv[1] != ".")
@@ -49,11 +48,10 @@ function loadFunction() {
               footerStatus('available');
               loadEvents();
             });
-          }, 1000);
-        }, 500);
-      });
+        });
+      }, 250);
     });
-  }, 1000);
+  }, 250);
   $('.overay').click(function(e) {
     closeAppFrame(e);
   });
