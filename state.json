@@ -1,20 +1,7 @@
 {
   "lastOpen": [
-    "cat-and-dog",
-    "flower"
   ],
   "projectsDetail": {
-    "cat-and-dog": {
-      "namespace": "cat-and-dog",
-      "name": "Cat and Dog",
-      "title": "Cat & Dogs",
-      "path": "D:\\GIMT\\Cat and Dog\\Cat and Dog.gimt"
-    },
-    "flower": {
-      "namespace": "flower",
-      "name": "Flowers",
-      "title": "Flowers",
-      "path": "D:\\GIMT\\Flowers\\Flowers.gimt"
-    }
+    
   }
 }

@@ -11,7 +11,23 @@ const fs = require('fs'),
       }
 
 var _State = {},
-    _U = {},
+    _U = {
+      project: {
+        namespace: "none",
+        name: "No model select",
+        title: "No model select",
+        iterations: 0,
+        order: {
+          group: 0,
+          dataset: 0
+        },
+        state: {
+          lbGroupAll: true,
+          groupSelected: 0,
+          dsItemSelected: 0
+        }
+      }
+    },
     _Log = [],
     isFrameOpen = false,
     isSecFrameOpen = false,
@@ -38,16 +54,20 @@ function loadFunction() {
         else {
           var isPathRight = false,
           chFRCount = 0;
-          while(isPathRight == false) {
-            if(fs.existsSync(_State.projectsDetail[_State.lastOpen[chFRCount]].path)) {
-              argPathProject = _State.projectsDetail[_State.lastOpen[chFRCount]].path;
-              isPathRight = true;
-            } else {
-              delete _State.projectsDetail[_State.lastOpen[chFRCount]];
-              delete _State.lastOpen[chFRCount];
-              saveProgramStateData()
+          try {
+            while(isPathRight == false) {
+              if(fs.existsSync(_State.projectsDetail[_State.lastOpen[chFRCount]].path)) {
+                argPathProject = _State.projectsDetail[_State.lastOpen[chFRCount]].path;
+                isPathRight = true;
+              } else {
+                delete _State.projectsDetail[_State.lastOpen[chFRCount]];
+                delete _State.lastOpen[chFRCount];
+                saveProgramStateData()
+              }
+              chFRCount++;
             }
-            chFRCount++;
+          } catch (error) {
+            keepLog(error);
           }
         }
 
@@ -63,7 +83,10 @@ function loadFunction() {
             });
           });
         }, function() {
-
+            loadComponent('./component/appFrame' ,'#app-frame', function() {
+              footerStatus('available');
+              loadEvents();
+          });
         });
       }, 250);
     });
