@@ -1,18 +1,4 @@
 <script>
-    function getRecent4Frame() {
-        var finalFrameSet = [];
-        $.each(_State.lastOpen, function( index, value ) {
-            var states = {
-                namespace: value,
-                label: _State.projectsDetail[value].title,
-                action: function(data) {
-                    dropModelOpen(data.namespace);
-                }
-            }
-            finalFrameSet.push(states);
-        });
-        return finalFrameSet;
-    }
     var appToolbars = new appframeInit({
         id: '#app-frame',
         menuTools: [
@@ -57,14 +43,7 @@
                             namespace: 'save-project',
                             label: 'Save',
                             action: function(data) {
-                                alert(data.label + ' Clicked!');
-                            }
-                        },
-                        {
-                            namespace: 'save-project-as',
-                            label: 'Save As...',
-                            action: function(data) {
-                                alert(data.label + ' Clicked!');
+                                saveProjectData()
                             }
                         }
                     ],
@@ -160,9 +139,9 @@
                         {
                             namespace: 'edit-label-group',
                             label: 'Edit Label Group Name',
-                            isDisable: true,
+                            isDisable: (() => (_U.project.state.groupSelected == 0))(),
                             action: function (data) {
-                                alert(data.label + ' Clicked!');
+                                dropGroupEdit();
                             }
                         }
                     ],

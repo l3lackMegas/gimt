@@ -131,7 +131,7 @@ h1, h2, h3, h4, p, ul {
     animation-duration: .25s;
     animation-fill-mode: forwards;
     transition-duration: .1s;
-    z-index: 999999;
+    z-index: 9999999;
 }
 
 #app-titleBar span {
@@ -223,7 +223,7 @@ h1, h2, h3, h4, p, ul {
     width: 100%;
     height: calc(100% - 49px);
     animation: zoomInOut .5s;
-    transition-duration: .1s;
+    transition-duration: .25s;
     overflow: hidden;
 }
 
@@ -260,7 +260,7 @@ h1, h2, h3, h4, p, ul {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: var(--bg-overay);
+    background-color: rgba(0,0,0,.8);
     z-index: 1000000;
     animation: fadeIn .25s;
 }

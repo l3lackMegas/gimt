@@ -31,23 +31,39 @@ function loadFunction() {
       _State = stateData;
       footerStatus('preparing', 'Loading GUI...');
       setTimeout(() => {
-        loadComponent('./component/appFrame' ,'#app-frame', function() {
-            $('#app-contentArea').show();
-            var argPathProject = '';
-            if(fs.existsSync(remote.process.argv[1]) == true && remote.process.argv[1] != ".")
-              argPathProject = remote.process.argv[1];
-            else
-              argPathProject = _State.projectsDetail[_State.lastOpen[0]].path;
+        $('#app-contentArea').show();
+        var argPathProject = '';
+        if(fs.existsSync(remote.process.argv[1]) == true && remote.process.argv[1] != ".")
+          argPathProject = remote.process.argv[1];
+        else {
+          var isPathRight = false,
+          chFRCount = 0;
+          while(isPathRight == false) {
+            if(fs.existsSync(_State.projectsDetail[_State.lastOpen[chFRCount]].path)) {
+              argPathProject = _State.projectsDetail[_State.lastOpen[chFRCount]].path;
+              isPathRight = true;
+            } else {
+              delete _State.projectsDetail[_State.lastOpen[chFRCount]];
+              delete _State.lastOpen[chFRCount];
+              saveProgramStateData()
+            }
+            chFRCount++;
+          }
+        }
 
-            _StateTP.solutionFile = argPathProject;
-            _StateTP.projectPath = require('path').dirname(argPathProject);
-            getStateFilesData(argPathProject, function(projectData) {
-              dropModelOpen(projectData.project.namespace, null, function(data) {
-                $('#tab-option-labelGroup .detailArea h3').html(findGroupStateSelected('id', data.project.state.groupSelected, ['name']));
-              });
+        _StateTP.solutionFile = argPathProject;
+        _StateTP.projectPath = require('path').dirname(argPathProject);
+        getStateFilesData(argPathProject, function(projectData) {
+          dropModelOpen(projectData.project.namespace, null, function(data) {
+            $('#tab-option-labelGroup .detailArea h3').html(findGroupStateSelected('id', data.project.state.groupSelected, ['name']));
+            keepLog((() => (_U.project.state.groupSelected != 0))());
+            loadComponent('./component/appFrame' ,'#app-frame', function() {
               footerStatus('available');
               loadEvents();
             });
+          });
+        }, function() {
+
         });
       }, 250);
     });
@@ -66,10 +82,16 @@ function loadEvents() {
   });
 }
 
-function getStateFilesData(path, fn) {
+function getStateFilesData(path, fn, error) {
     var filename = path;
     fs.readFile(filename, 'utf8', function(err, data) {
-      if (err) throw err;
+      if (err) {
+        wasumiMessage.openMsg(err, 'Ops! Something went wrong.', 'error', {
+          option: ['okay'],
+        });
+        if(error) error();
+        throw err;
+      }
       if(fn) fn(JSON.parse(data));
     });
 }
@@ -93,6 +115,23 @@ function saveProjectData() {
   writeStatesFilesData(_StateTP.solutionFile, JSON.stringify(_U, null, 2), function() {
     keepLog('Project Save Saved!');
   });
+}
+
+function getRecent4Frame() {
+  var finalFrameSet = [];
+  $.each(_State.lastOpen, function( index, value ) {
+      if(value != undefined && value != null && value != "undefined") {
+          var states = {
+              namespace: value,
+              label: _State.projectsDetail[value].title,
+              action: function(data) {
+                  dropModelOpen(data.namespace);
+              }
+          }
+          finalFrameSet.push(states);
+      }
+  });
+  return finalFrameSet;
 }
 
 function footerStatus(mode, msg) {
@@ -144,9 +183,9 @@ function loadComponent(urlPath ,id ,fn){
         setTimeout(function() {
           var msg = '';
           if (jqXHR.status === 0) {
-              msg = '[' + jqXHR.status +'] คอมพิวเตอร์ของคุณกำลังออฟไลน์อยู่';
+              msg = '[' + jqXHR.status +'] Unknow error.\n' + JSON.stringify(jqXHR, null, 2);
           } else if (jqXHR.status == 404) {
-              msg = '[' + jqXHR.status +'] ระบบไม่พบที่อยู่ของเซิร์ฟเวอร์ โปรดอัพเดตเวอร์ชั่น 48Gen';
+              msg = '[' + jqXHR.status +'] Oparate not found.';
           } else if (jqXHR.status == 500) {
               msg = '[' + jqXHR.status +'] เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์';
           } else if (exception === 'parsererror') {
@@ -159,6 +198,9 @@ function loadComponent(urlPath ,id ,fn){
               msg = 'เกิดข้อผิดพลาดที่ไม่คาดคิด.\n' + jqXHR.responseText;
           }
           //showError(true, "ไม่สามารถเชื่อมต่อกับ System Core !", msg)
+          wasumiMessage.openMsg(msg, 'Ops! Something went wrong.', 'error', {
+            option: ['okay'],
+          });
         }, 1500);
       }
     }); 
@@ -419,6 +461,9 @@ function sideMenuHandle(target, event) {
 
 function showDialog(target) {
   loadComponent('./dialog/' + target, null, function(response) {
+    $('#app-contentArea').css({
+      transform: 'scale(0.975)'
+    });
     $('#dialog').append(response);
     $('#modalBackdrop').show();
   });
@@ -427,6 +472,9 @@ function showDialog(target) {
 function closeDialog() {
   $('#modalBackdrop .contain').css('animation', 'bounceOut .26s');
   $('#modalBackdrop').css('animation', 'fadeOut .5s');
+  $('#app-contentArea').css({
+    transform: ''
+  });
   setTimeout(() => {
     $('#dialog').html('');
     $('#modalBackdrop').attr('style', '');
@@ -469,6 +517,11 @@ function keepLog(objLog) {
   console.log(objLog);
   _Log.push(objLog);
 }
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 
 function randStr() {
   var text = "";

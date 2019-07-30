@@ -7,7 +7,7 @@
     height: 100%;
 	color: #5d5d5d;
 	font-family: 'Kanit', sans-serif;
-    background-color: rgba(0,0,0,.2);
+    background-color: rgba(0,0,0,.4);
     animation: wasu-fadeIn .25s;
     z-index: 9999999;
     box-sizing: border-box;

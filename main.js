@@ -35,7 +35,7 @@ global.Site = {
   isError: false,
   errorTitle: "",
   errorMsg: "",
-  isDev: false
+  isDev: true
 };
 
 function createWindow () {

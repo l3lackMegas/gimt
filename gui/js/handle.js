@@ -37,14 +37,7 @@ function handleTraining(event) {
 }
 
 function optionModule(event) {
-    var finalSet = [];
-    $.each(_State.lastOpen, function( index, value ) {
-        var states = {
-            namespace: value,
-            label: _State.projectsDetail[value].title
-        }
-        finalSet.push(states);
-    });
+    var finalSet = getRecent4Frame();
     setToolsDropPanel(event, [
         {
             label: 'Model',
@@ -77,7 +70,7 @@ function dropModelOpen(namespace, event, fn) {
         if(namespace != value) currentLOP.push(value);
     })
     _State.lastOpen = currentLOP;
-    appToolbars.objCore['open-recent'].subSection[0] = getRecent4Frame();
+
     closeToolsDropPanel();
     _StateTP.projectPath = require('path').dirname(_State.projectsDetail[namespace].path);
     _StateTP.solutionFile = _State.projectsDetail[namespace].path;
@@ -85,6 +78,11 @@ function dropModelOpen(namespace, event, fn) {
         _U = projectData;
         $('#tab-option-module h3').html(_U.project.title + " - " + _U.project.iterations + " Iterations");
         $('#tab-option-labelGroup .detailArea h3').html(findGroupStateSelected('id', _U.project.state.groupSelected, ['name']));
+        try {
+            appToolbars.objCore['open-recent'].subSection[0] = getRecent4Frame();
+        } catch (error) {
+            
+        }
         loadComponent('./page/' + sideCrrPage ,'#pageArea', function() {
             if($("#pageCroping").length > 0) setTimeout(() => {
                 imgCropSelect(0);
@@ -92,6 +90,14 @@ function dropModelOpen(namespace, event, fn) {
             saveProgramStateData();
         });
         if(fn) fn(_U);
+    }, function() { //Error
+        if(!fs.existsSync(_State.projectsDetail[namespace].path)) {
+            delete _State.projectsDetail[namespace];
+            $.each(_State.lastOpen, function( index, value ) {
+                if(value == namespace) delete _State.lastOpen[index];
+            })
+            saveProgramStateData();
+          }
     });
 }
 
@@ -212,8 +218,10 @@ function dropGroupAdd(event) {
     }, 250);
 }
 
-function dropGroupEdit(event) {
-    _StateTP.crrEditGroupState = findGroupStateSelected('namespace', $(event).attr('data'), ['id', 'name', 'namespace']);
+async function dropGroupEdit(event) {
+    if(event) _StateTP.crrEditGroupState = findGroupStateSelected('namespace', $(event).attr('data'), ['id', 'name', 'namespace']);
+    else _StateTP.crrEditGroupState = findGroupStateSelected('id', _U.project.state.groupSelected, ['id', 'name', 'namespace']);
+    await sleep(100);
     showDialog('editLabelGroup');
     setTimeout(() => {
         $('#lbGroupName').focus();
@@ -230,6 +238,7 @@ function addLabelGroup(event) {
         $('#modalBackdrop .contain dialog .dialog-footer button').prop('disabled', true);
         $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').html('<i class="fas fa-circle-notch fa-spin"></i><span>Adding label...</span>');
         $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').fadeIn(100);
+        labelGroupOnchange();
         var setGroupState = {
             id: _U.project.order.group,
             namespace: $('#lbGroupNamespace').val(),
@@ -254,6 +263,7 @@ function editLabelGroup(event) {
     $('#modalBackdrop .contain dialog .dialog-footer button').prop('disabled', true);
     $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').html('<i class="fas fa-circle-notch fa-spin"></i><span>Editing label...</span>');
     $('#modalBackdrop .contain dialog .dialog-footer .loadingIcon').fadeIn(100);
+    labelGroupOnchange();
     if(($('#lbGroupNamespace').val() != "" && $('#lbGroupNamespace').val() != "none" && $('#lbGroupNamespace').val() != "all" && findGroupStateSelected('namespace', $('#lbGroupNamespace').val(), ['key']) == undefined) || $('#lbGroupNamespace').val() == _StateTP.crrEditGroupState.namespace) {
         var setGroupState = {
             id: _StateTP.crrEditGroupState.id,
@@ -333,8 +343,8 @@ function dropGropOpen(namespace, event, isNotCls) {
     } else if(findGroupStateSelected('id', _U.project.state.groupSelected, ['namespace']) == "none" && _U.project.state.lbGroupAll == false) {
         isSPName = 'none'
     }
-    console.log(namespace, findGroupStateSelected('id', _U.project.state.groupSelected, ['namespace']), namespace != findGroupStateSelected('id', _U.project.state.groupSelected, ['namespace']))
-    console.log((namespace != findGroupStateSelected('id', _U.project.state.groupSelected, ['namespace']) && namespace != "none" && namespace != "all"))
+    //console.log(namespace, findGroupStateSelected('id', _U.project.state.groupSelected, ['namespace']), namespace != findGroupStateSelected('id', _U.project.state.groupSelected, ['namespace']))
+    //console.log((namespace != findGroupStateSelected('id', _U.project.state.groupSelected, ['namespace']) && namespace != "none" && namespace != "all"))
     if(namespace != findGroupStateSelected('id', _U.project.state.groupSelected, ['namespace']) && namespace != "none" && namespace != "all") {
         if(namespace == 'all') _U.project.state.lbGroupAll = true; else _U.project.state.lbGroupAll = false;
         _U.project.state.groupSelected = findGroupStateSelected('namespace', namespace, ['id']);
@@ -358,18 +368,33 @@ function dropGropOpen(namespace, event, isNotCls) {
             }, 50);
         });
     }
+    if(_U.project.state.groupSelected == 0) {
+        appToolbars.disable('edit-label-group');
+    } else {
+        appToolbars.enable('edit-label-group');
+    }
 }
 
 function getDatasets(tGroupID) {
     var output = [];
     if(tGroupID == undefined || _U.project.state.lbGroupAll == true) {
         $.each(_U.solution.dataset, function( index, value ) {
-            output.push(value);
+            if(fs.existsSync(_StateTP.projectPath + "\\datasets\\" + value.filename)) {
+                output.push(value);
+            } else {
+                delete _U.solution.dataset[index];
+                saveProjectData()
+            }
         });
     } else {
         $.each(_U.solution.dataset, function(index, datasetState) {
             if(datasetState.groupID == tGroupID) {
-                output.push(datasetState);
+                if(fs.existsSync(_StateTP.projectPath + "\\datasets\\" + datasetState.filename)) {
+                    output.push(datasetState);
+                } else {
+                    delete _U.solution.dataset[index];
+                    saveProjectData()
+                }
             }
         });
     }

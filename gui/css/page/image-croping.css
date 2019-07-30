@@ -54,6 +54,11 @@
     color: white;
 }
 
+#pageCroping .panel-list ul li.active:hover {
+    background-color: rgba(255,255,255,.25);
+    color: white;
+}
+
 #pageCroping .panel-list ul li:hover {
     background-color: rgba(255,255,255,.1);
     color: white;

@@ -39,6 +39,14 @@
                 <button id="btn-close">X</button>
             </div>
         </div>
+        <div id="modalBackdrop">
+            <div class="contain">
+                <div class="clsDislog" onclick="closeDialog()"></div>
+                <dialog id="dialog" open>
+                    
+                </dialog>
+            </div>
+        </div>
         <div id="app-contentArea">
             <div id="side-menu">
                 <button class="btn-cls" onclick="toggleSideMenu()"><i class="fas fa-arrow-left"></i></button>
@@ -90,14 +98,6 @@
                 <script>
                     loadComponent('./page/welcome' ,'#pageArea');
                 </script>
-            </div>
-            <div id="modalBackdrop">
-                <div class="contain">
-                    <div class="clsDislog" onclick="closeDialog()"></div>
-                    <dialog id="dialog" open>
-                        
-                    </dialog>
-                </div>
             </div>
         </div>
         <div id="footerStatus">
