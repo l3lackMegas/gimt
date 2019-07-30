@@ -379,21 +379,25 @@ function getDatasets(tGroupID) {
     var output = [];
     if(tGroupID == undefined || _U.project.state.lbGroupAll == true) {
         $.each(_U.solution.dataset, function( index, value ) {
-            if(fs.existsSync(_StateTP.projectPath + "\\datasets\\" + value.filename)) {
-                output.push(value);
-            } else {
-                delete _U.solution.dataset[index];
-                saveProjectData()
+            if(value != undefined && value != null) {
+                if(fs.existsSync(_StateTP.projectPath + "\\datasets\\" + value.filename)) {
+                    output.push(value);
+                } else {
+                    delete _U.solution.dataset[index];
+                    saveProjectData()
+                }
             }
         });
     } else {
         $.each(_U.solution.dataset, function(index, datasetState) {
             if(datasetState.groupID == tGroupID) {
-                if(fs.existsSync(_StateTP.projectPath + "\\datasets\\" + datasetState.filename)) {
-                    output.push(datasetState);
-                } else {
-                    delete _U.solution.dataset[index];
-                    saveProjectData()
+                if(datasetState != undefined && datasetState != null) {
+                    if(fs.existsSync(_StateTP.projectPath + "\\datasets\\" + datasetState.filename)) {
+                        output.push(datasetState);
+                    } else {
+                        delete _U.solution.dataset[index];
+                        saveProjectData()
+                    }
                 }
             }
         });
