@@ -29,7 +29,7 @@
             });
         </script>
     </head>
-    <body onload="loadFunction();">
+    <body onload="afterAppStart();">
         <div id="app-titleBar">
             <span><img id="favicon" src="img/mini-Logo.png"></span>
             <div id="app-frame"></div>
@@ -103,5 +103,12 @@
         <div id="footerStatus">
             <span id="footer-txtStatus"><i class="fas fa-circle-notch fa-spin"></i> Preparing...</span>
         </div>
+        <script>
+            function afterAppStart() {
+                setTimeout(() => {
+                    loadFunction();
+                }, 1500);
+            }
+        </script>
     </body>
 </html>

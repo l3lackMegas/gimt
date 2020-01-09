@@ -41,11 +41,10 @@ var _State = {},
 var autoSaveState;
 
 function loadFunction() {
+  footerStatus('preparing', 'Loading State...');
   setTimeout(() => {
-    footerStatus('preparing', 'Loading State...');
     getStateFilesData(getSiteGlobal('Site').startPath + '\\state.json', function(stateData) {
       _State = stateData;
-<<<<<<< HEAD
         footerStatus('preparing', 'Loading GUI...');
       if(_State.lastOpen.length > 0) {
         setTimeout(() => {
@@ -72,18 +71,6 @@ function loadFunction() {
               keepLog(error);
             }
           }
-=======
-      loadComponent('./component/appFrame' ,'#app-frame', function() {
-        setTimeout(() => {
-          footerStatus('preparing', 'Loading GUI...');
-          setTimeout(() => {
-            $('#app-contentArea').show();
-            var argPathProject = '';
-            if(fs.existsSync(remote.process.argv[1]) == true && remote.process.argv[1] != ".")
-              argPathProject = remote.process.argv[1];
-            else
-              argPathProject = _State.projectsDetail[_State.lastOpen[0]].path;
->>>>>>> parent of 3e6ec03... -Startup Animation
 
           _StateTP.solutionFile = argPathProject;
           _StateTP.projectPath = require('path').dirname(argPathProject);
@@ -101,7 +88,6 @@ function loadFunction() {
               footerStatus('available');
               loadEvents();
             });
-<<<<<<< HEAD
           });
         }, 250);
       } else {
@@ -114,13 +100,8 @@ function loadFunction() {
         }, 250);
       }
       
-=======
-          }, 1000);
-        }, 500);
-      });
->>>>>>> parent of 3e6ec03... -Startup Animation
     });
-  }, 1000);
+  }, 250);
   $('.overay').click(function(e) {
     closeAppFrame(e);
   });
