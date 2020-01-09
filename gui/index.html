@@ -29,7 +29,7 @@
             });
         </script>
     </head>
-    <body onload="afterAppStart();">
+    <body onload="loadFunction();">
         <div id="app-titleBar">
             <span><img id="favicon" src="img/mini-Logo.png"></span>
             <div id="app-frame"></div>
@@ -63,25 +63,25 @@
                     <i class="fas fa-cubes"></i>
                     <div class="detailArea">
                         <p>Model Name:</p>
-                        <h3>Title - N/A Iterations</h3>
+                        <h3>No model selected</h3>
                     </div>
                     <p class="arrow-right">
                         <span class="down" style="display: block;"><i class="fas fa-sort-down"></i></span>
                         <span class="up"><i class="fas fa-sort-up"></i></span>
                     </p>
                 </div>
-                <div id="tab-option-labelGroup" class="panel-tab-option" onclick="optionGroup(this)">
+                <div id="tab-option-labelGroup" class="panel-tab-option disable" onclick="optionGroup(this)">
                     <i class="far fa-object-group"></i>
                     <div class="detailArea">
                         <p>Label Group:</p>
-                        <h3>No group select</h3>
+                        <h3>No group selected</h3>
                     </div>
                     <p class="arrow-right">
                         <span class="down" style="display: block;"><i class="fas fa-sort-down"></i></span>
                         <span class="up"><i class="fas fa-sort-up"></i></span>
                     </p>
                 </div>
-                <div id="training-panel" class="panel-tab-option pointing" onclick="handleTraining(this)">
+                <div id="training-panel" class="panel-tab-option pointing disable" onclick="handleTraining(this)">
                     <i class="fas fa-play"></i>
                     <div>
                         <h3>Start Train</h3>
@@ -96,19 +96,12 @@
             </div>
             <div id="pageArea" class="page">
                 <script>
-                    loadComponent('./page/welcome' ,'#pageArea');
+                    loadComponent('./page/dashboard' ,'#pageArea');
                 </script>
             </div>
         </div>
         <div id="footerStatus">
             <span id="footer-txtStatus"><i class="fas fa-circle-notch fa-spin"></i> Preparing...</span>
         </div>
-        <script>
-            function afterAppStart() {
-                setTimeout(() => {
-                    loadFunction();
-                }, 1500);
-            }
-        </script>
     </body>
 </html>

@@ -41,56 +41,86 @@ var _State = {},
 var autoSaveState;
 
 function loadFunction() {
-  footerStatus('preparing', 'Loading State...');
   setTimeout(() => {
+    footerStatus('preparing', 'Loading State...');
     getStateFilesData(getSiteGlobal('Site').startPath + '\\state.json', function(stateData) {
       _State = stateData;
-      footerStatus('preparing', 'Loading GUI...');
-      setTimeout(() => {
-        $('#app-contentArea').show();
-        var argPathProject = '';
-        if(fs.existsSync(remote.process.argv[1]) == true && remote.process.argv[1] != ".")
-          argPathProject = remote.process.argv[1];
-        else {
-          var isPathRight = false,
-          chFRCount = 0;
-          try {
-            while(isPathRight == false) {
-              if(fs.existsSync(_State.projectsDetail[_State.lastOpen[chFRCount]].path)) {
-                argPathProject = _State.projectsDetail[_State.lastOpen[chFRCount]].path;
-                isPathRight = true;
-              } else {
-                delete _State.projectsDetail[_State.lastOpen[chFRCount]];
-                delete _State.lastOpen[chFRCount];
-                saveProgramStateData()
+<<<<<<< HEAD
+        footerStatus('preparing', 'Loading GUI...');
+      if(_State.lastOpen.length > 0) {
+        setTimeout(() => {
+          $('#app-contentArea').show();
+          var argPathProject = '';
+          if(fs.existsSync(remote.process.argv[1]) == true && remote.process.argv[1] != ".")
+            argPathProject = remote.process.argv[1];
+          else {
+            var isPathRight = false,
+            chFRCount = 0;
+            try {
+              while(isPathRight == false) {
+                if(fs.existsSync(_State.projectsDetail[_State.lastOpen[chFRCount]].path)) {
+                  argPathProject = _State.projectsDetail[_State.lastOpen[chFRCount]].path;
+                  isPathRight = true;
+                } else {
+                  delete _State.projectsDetail[_State.lastOpen[chFRCount]];
+                  delete _State.lastOpen[chFRCount];
+                  saveProgramStateData()
+                }
+                chFRCount++;
               }
-              chFRCount++;
+            } catch (error) {
+              keepLog(error);
             }
-          } catch (error) {
-            keepLog(error);
           }
-        }
+=======
+      loadComponent('./component/appFrame' ,'#app-frame', function() {
+        setTimeout(() => {
+          footerStatus('preparing', 'Loading GUI...');
+          setTimeout(() => {
+            $('#app-contentArea').show();
+            var argPathProject = '';
+            if(fs.existsSync(remote.process.argv[1]) == true && remote.process.argv[1] != ".")
+              argPathProject = remote.process.argv[1];
+            else
+              argPathProject = _State.projectsDetail[_State.lastOpen[0]].path;
+>>>>>>> parent of 3e6ec03... -Startup Animation
 
-        _StateTP.solutionFile = argPathProject;
-        _StateTP.projectPath = require('path').dirname(argPathProject);
-        getStateFilesData(argPathProject, function(projectData) {
-          dropModelOpen(projectData.project.namespace, null, function(data) {
-            $('#tab-option-labelGroup .detailArea h3').html(findGroupStateSelected('id', data.project.state.groupSelected, ['name']));
-            keepLog((() => (_U.project.state.groupSelected != 0))());
+          _StateTP.solutionFile = argPathProject;
+          _StateTP.projectPath = require('path').dirname(argPathProject);
+          getStateFilesData(argPathProject, function(projectData) {
+            dropModelOpen(projectData.project.namespace, null, function(data) {
+              $('#tab-option-labelGroup .detailArea h3').html(findGroupStateSelected('id', data.project.state.groupSelected, ['name']));
+              keepLog((() => (_U.project.state.groupSelected != 0))());
+              loadComponent('./component/appFrame' ,'#app-frame', function() {
+                footerStatus('available');
+                loadEvents();
+              });
+            });
+          }, function(e) {
             loadComponent('./component/appFrame' ,'#app-frame', function() {
               footerStatus('available');
               loadEvents();
             });
+<<<<<<< HEAD
           });
-        }, function() {
-            loadComponent('./component/appFrame' ,'#app-frame', function() {
-              footerStatus('available');
-              loadEvents();
+        }, 250);
+      } else {
+        setTimeout(() => {
+          $('#app-contentArea').show();
+          loadComponent('./component/appFrame' ,'#app-frame', function() {
+            footerStatus('available');
+            loadEvents();
           });
-        });
-      }, 250);
+        }, 250);
+      }
+      
+=======
+          }, 1000);
+        }, 500);
+      });
+>>>>>>> parent of 3e6ec03... -Startup Animation
     });
-  }, 250);
+  }, 1000);
   $('.overay').click(function(e) {
     closeAppFrame(e);
   });
@@ -105,14 +135,14 @@ function loadEvents() {
   });
 }
 
-function getStateFilesData(path, fn, error) {
+function getStateFilesData(path, fn, finish) {
     var filename = path;
     fs.readFile(filename, 'utf8', function(err, data) {
       if (err) {
         wasumiMessage.openMsg(err, 'Ops! Something went wrong.', 'error', {
           option: ['okay'],
         });
-        if(error) error();
+        if(finish) finish(err);
         throw err;
       }
       if(fn) fn(JSON.parse(data));
@@ -268,12 +298,13 @@ function appframeInit(data) {
       $.each(coreObj[$(this).attr('data')].subSection, function( index, subSectionVal ) {
         if(index > 0) cmpSec.append('<div class="line"></div>');
         $.each(subSectionVal, function( index, section ) {
-          var disableClass = ''
+          var disableClass = '',
+              cmpSecHTML = '';
           if(isDisable[section.namespace]) disableClass = 'class="disable" ';
-          if(section.subSection)
-            cmpSec.append('<a id="frame-' + section.namespace + '"' + disableClass + 'onmouseover="subSectionAppFrame(\'' + section.namespace + '\', this)" onclick="actionAppFrame(\'' + section.namespace + '\')">' + section.label + '<span class="more-section">></span></a>');
-          else
-            cmpSec.append('<a id="frame-' + section.namespace + '"' + disableClass + 'onmouseover="subSectionAppFrame(\'' + section.namespace + '\', this)" onclick="actionAppFrame(\'' + section.namespace + '\')">' + section.label + '</a>');
+          cmpSecHTML = '<a id="frame-' + section.namespace + '"' + disableClass + 'onmouseover="subSectionAppFrame(\'' + section.namespace + '\', this)" onclick="actionAppFrame(\'' + section.namespace + '\')">' + section.label + '</a>';
+          if(section.subSection) 
+            cmpSecHTML = '<a id="frame-' + section.namespace + '"' + disableClass + 'onmouseover="subSectionAppFrame(\'' + section.namespace + '\', this)" onclick="actionAppFrame(\'' + section.namespace + '\')">' + section.label + '<span class="more-section">></span></a>';
+          cmpSec.append(cmpSecHTML);
         });
       });
       cmpSec.css('left', e.target.offsetLeft + 'px');
@@ -293,12 +324,15 @@ function appframeInit(data) {
       $.each(coreObj[$(this).attr('data')].subSection, function( index, subSectionVal ) {
         if(index > 0) cmpSec.append('<div class="line"></div>');
         $.each(subSectionVal, function( index, section ) {
-          var disableClass = ''
+          var disableClass = '',
+              cmpSecHTML = '';
           if(isDisable[section.namespace]) disableClass = 'class="disable" ';
+          cmpSecHTML = '<a id="frame-' + section.namespace + '"' + disableClass + 'onmouseover="subSectionAppFrame(\'' + section.namespace + '\', this)" onclick="actionAppFrame(\'' + section.namespace + '\')">' + section.label + '</a>'
           if(section.subSection)
-            cmpSec.append('<a id="frame-' + section.namespace + '"' + disableClass + 'onmouseover="subSectionAppFrame(\'' + section.namespace + '\', this)" onclick="actionAppFrame(\'' + section.namespace + '\')">' + section.label + '<span class="more-section">></span></a>');
-          else
-            cmpSec.append('<a id="frame-' + section.namespace + '"' + disableClass + 'onmouseover="subSectionAppFrame(\'' + section.namespace + '\', this)" onclick="actionAppFrame(\'' + section.namespace + '\')">' + section.label + '</a>');
+            cmpSecHTML = '<a id="frame-' + section.namespace + '"' + disableClass + 'onmouseover="subSectionAppFrame(\'' + section.namespace + '\', this)" onclick="actionAppFrame(\'' + section.namespace + '\')">' + section.label + '<span class="more-section">></span></a>'
+          
+
+            cmpSec.append(cmpSecHTML);
         });
       });
       cmpSec.css('left', e.target.offsetLeft + 'px');
@@ -325,7 +359,7 @@ function appframeInit(data) {
 }
 
 function actionAppFrame(namespace) {
-  if(!appToolbars.isDisable[namespace]) {
+  if(!appToolbars.isDisable[namespace] && appToolbars.action[namespace]) {
     appToolbars.action[namespace].action(appToolbars.action[namespace]);
     closeAppFrame();
   }
@@ -334,26 +368,33 @@ function actionAppFrame(namespace) {
 function subSectionAppFrame(namespace, obj) {
   //appToolbars.action[namespace].action(appToolbars.action[namespace]);
   if(appToolbars.objCore[namespace].subSection) {
-    $('.frame-section a').removeClass('active');
-    $(obj).addClass('active');
-    $('.frame-section[sec-type="section"]').remove()
-    var cmpSec = $(components.frameSection);
-    cmpSec.attr('sec-type', 'section');
-    if(isSecFrameOpen == false) cmpSec.css('animation', 'fadeIn .5s forwards');
-    isSecFrameOpen = true;
-    $.each(appToolbars.objCore[namespace].subSection, function( index, subSectionVal ) {
-      if(index > 0) cmpSec.append('<div class="line"></div>');
-      $.each(subSectionVal, function( index, section ) {
-        var disableClass = ''
-        if(appToolbars.isDisable[section.namespace]) disableClass = 'class="disable" ';
-        cmpSec.append('<a id="frame-' + section.namespace + '"' + disableClass + 'onclick="actionAppFrame(\'' + section.namespace + '\')">' + section.label + '</a>');
+    if(appToolbars.objCore[namespace].subSection[0].length > 0) {
+      $('.frame-section a').removeClass('active');
+      $(obj).addClass('active');
+      $('.frame-section[sec-type="section"]').remove()
+      var cmpSec = $(components.frameSection);
+      cmpSec.attr('sec-type', 'section');
+      if(isSecFrameOpen == false) cmpSec.css('animation', 'fadeIn .5s forwards');
+      isSecFrameOpen = true;
+      $.each(appToolbars.objCore[namespace].subSection, function( index, subSectionVal ) {
+        if(index > 0) cmpSec.append('<div class="line"></div>');
+        $.each(subSectionVal, function( index, section ) {
+          var disableClass = ''
+          if(appToolbars.isDisable[section.namespace]) disableClass = 'class="disable" ';
+          cmpSec.append('<a id="frame-' + section.namespace + '"' + disableClass + 'onclick="actionAppFrame(\'' + section.namespace + '\')">' + section.label + '</a>');
+        });
       });
-    });
-    cmpSec.css({
-      top: ($(obj).offset().top - 36) + 'px',
-      left: ($(obj).offset().left + $(obj).width() + 20) + 'px'
-    });
-    $('#app-contentArea').append(cmpSec[0].outerHTML);
+      cmpSec.css({
+        top: ($(obj).offset().top - 36) + 'px',
+        left: ($(obj).offset().left + $(obj).width() + 20) + 'px'
+      });
+      $('#app-contentArea').append(cmpSec[0].outerHTML);
+    } else {
+      $('.frame-section a').removeClass('active');
+      $('a[sec-type="section"]').remove()
+      $('.frame-section[sec-type="section"]').remove()
+      isSecFrameOpen = false;
+    }
   } else {
     $('.frame-section a').removeClass('active');
     $('a[sec-type="section"]').remove()

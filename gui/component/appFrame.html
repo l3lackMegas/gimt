@@ -33,6 +33,7 @@
                         {
                             namespace: 'open-recent',
                             label: 'Open Recent',
+                            isDisable: (() => (_State.lastOpen.length == 0))(),
                             subSection: [
                                 getRecent4Frame()
                             ]

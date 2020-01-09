@@ -1,38 +1,40 @@
 var coreStatus = "ready"
 
 function handleTraining(event) {
-    switch(coreStatus) {
-        case "ready" :
-            appToolbars.disable('start-train');
-            coreStatus = "preparinig"
-            $(event).addClass('disable');
-            $('h3', event).html('Starting train')
-            $('p', event).html('processing...')
-            $('svg', event).remove();
-            $(event).prepend('<i class="fas fa-circle-notch fa-spin"></i>');
-            footerStatus('preparing');
-            setTimeout(() => {
-                $('h3', event).html('Stop Training')
-                $('p', event).html('process will stop.')
+    if(_U.project.namespace != "none") {
+        switch(coreStatus) {
+            case "ready" :
+                appToolbars.disable('start-train');
+                coreStatus = "preparinig"
+                $(event).addClass('disable');
+                $('h3', event).html('Starting train')
+                $('p', event).html('processing...')
                 $('svg', event).remove();
-                $(event).prepend('<i class="fas fa-stop"></i>');
-                footerStatus('training');
-                coreStatus = "training"
-                $(event).removeClass('disable');
-                appToolbars.enable('stop-train');
-            }, 2000);
-            break;
-
-        case "training" :
-            appToolbars.disable('stop-train');
-            coreStatus = "ready"
-            $('h3', event).html('Start Train')
-            $('p', event).html('with GPU')
-            $('svg', event).remove();
-            $(event).prepend('<i class="fas fa-play"></i>');
-            appToolbars.enable('start-train');
-            footerStatus('available');
-            break;
+                $(event).prepend('<i class="fas fa-circle-notch fa-spin"></i>');
+                footerStatus('preparing');
+                setTimeout(() => {
+                    $('h3', event).html('Stop Training')
+                    $('p', event).html('process will stop.')
+                    $('svg', event).remove();
+                    $(event).prepend('<i class="fas fa-stop"></i>');
+                    footerStatus('training');
+                    coreStatus = "training"
+                    $(event).removeClass('disable');
+                    appToolbars.enable('stop-train');
+                }, 2000);
+                break;
+    
+            case "training" :
+                appToolbars.disable('stop-train');
+                coreStatus = "ready"
+                $('h3', event).html('Start Train')
+                $('p', event).html('with GPU')
+                $('svg', event).remove();
+                $(event).prepend('<i class="fas fa-play"></i>');
+                appToolbars.enable('start-train');
+                footerStatus('available');
+                break;
+        }
     }
 }
 
@@ -145,70 +147,73 @@ function findGroupStateSelected(target, value, rtBack) {
 }
 
 function optionGroup(event, isUpdate) {
-    var finalSet = [
-        {
-            namespace: 'all',
-            label: 'All',
+    if(_U.project.namespace != "none") {
+        var finalSet = [
+            {
+                namespace: 'all',
+                label: 'All',
+                noEdit: true
+            }
+        ];
+        $.each(_U.solution.group, function( index, value ) {
+            var states = {
+                namespace: value.namespace,
+                label: value.name
+            }
+            finalSet.push(states);
+        });
+        var states = {
+            namespace: 'none',
+            label: 'Others',
             noEdit: true
         }
-    ];
-    $.each(_U.solution.group, function( index, value ) {
-        var states = {
-            namespace: value.namespace,
-            label: value.name
-        }
         finalSet.push(states);
-    });
-    var states = {
-        namespace: 'none',
-        label: 'Others',
-        noEdit: true
+        var crDSelect = 'all';
+        if(_U.project.state.lbGroupAll == false) crDSelect = findGroupStateSelected('id', _U.project.state.groupSelected, ['namespace']);
+        if(isUpdate == true) {
+            $('.tools-drop-panel').remove();
+            showToolsDropPanel(event, [
+                {
+                    label: 'Group',
+                    fnName: 'dropGropOpen',
+                    icon: '<i class="far fa-object-ungroup"></i>',
+                    button: {
+                        name: 'Add',
+                        fnName: 'dropGroupAdd'
+                    },
+                    editFnName: 'dropGroupEdit',
+                    projects: finalSet,
+                    currentSelect: crDSelect
+                }
+            ]);
+        } else {
+            setToolsDropPanel(event, [
+                {
+                    label: 'Group',
+                    fnName: 'dropGropOpen',
+                    icon: '<i class="far fa-object-ungroup"></i>',
+                    button: {
+                        name: 'Add',
+                        fnName: 'dropGroupAdd'
+                    },
+                    editFnName: 'dropGroupEdit',
+                    projects: finalSet,
+                    currentSelect: crDSelect
+                }
+            ]);
+        }
+        var tgScroll = 0;
+        if(findGroupStateSelected('id', _U.project.state.groupSelected, ['id']) != 0)
+            tgScroll = (27 * findGroupStateSelected('id', _U.project.state.groupSelected, ['id'])) - 127
+        else if(findGroupStateSelected('id', _U.project.state.groupSelected, ['id']) == 0 && _U.project.state.lbGroupAll == true)
+            tgScroll = 0;
+        else
+            tgScroll = (27 * _U.project.order.group) - 127;
+        $(".tools-drop-panel .areaAction").animate({
+            scrollTop: tgScroll
+        }, 750);
     }
-    finalSet.push(states);
-    var crDSelect = 'all';
-    if(_U.project.state.lbGroupAll == false) crDSelect = findGroupStateSelected('id', _U.project.state.groupSelected, ['namespace']);
-    if(isUpdate == true) {
-        $('.tools-drop-panel').remove();
-        showToolsDropPanel(event, [
-            {
-                label: 'Group',
-                fnName: 'dropGropOpen',
-                icon: '<i class="far fa-object-ungroup"></i>',
-                button: {
-                    name: 'Add',
-                    fnName: 'dropGroupAdd'
-                },
-                editFnName: 'dropGroupEdit',
-                projects: finalSet,
-                currentSelect: crDSelect
-            }
-        ]);
-    } else {
-        setToolsDropPanel(event, [
-            {
-                label: 'Group',
-                fnName: 'dropGropOpen',
-                icon: '<i class="far fa-object-ungroup"></i>',
-                button: {
-                    name: 'Add',
-                    fnName: 'dropGroupAdd'
-                },
-                editFnName: 'dropGroupEdit',
-                projects: finalSet,
-                currentSelect: crDSelect
-            }
-        ]);
-    }
-    var tgScroll = 0;
-    if(findGroupStateSelected('id', _U.project.state.groupSelected, ['id']) != 0)
-        tgScroll = (27 * findGroupStateSelected('id', _U.project.state.groupSelected, ['id'])) - 127
-    else if(findGroupStateSelected('id', _U.project.state.groupSelected, ['id']) == 0 && _U.project.state.lbGroupAll == true)
-        tgScroll = 0;
-    else
-        tgScroll = (27 * _U.project.order.group) - 127;
-    $(".tools-drop-panel .areaAction").animate({
-        scrollTop: tgScroll
-    }, 750);
+    
 }
 
 function dropGroupAdd(event) {
@@ -311,10 +316,12 @@ function deleteLabelGroup(event) {
                 _U.solution.group = newGroupState;
 
                 $.each(_U.solution.dataset, function(index, obj) {
-                    if(obj.groupID == groupState.id) {
-                        obj.groupID = 0;
+                    if(obj != undefined && obj != null) {
+                        if(obj.groupID == groupState.id) {
+                            obj.groupID = 0;
+                        }
+                        newDatasetState.push(obj);
                     }
-                    newDatasetState.push(obj);
                 });
                 _U.solution.dataset = newDatasetState;
                 saveProjectData();
@@ -377,30 +384,32 @@ function dropGropOpen(namespace, event, isNotCls) {
 
 function getDatasets(tGroupID) {
     var output = [];
-    if(tGroupID == undefined || _U.project.state.lbGroupAll == true) {
-        $.each(_U.solution.dataset, function( index, value ) {
-            if(value != undefined && value != null) {
-                if(fs.existsSync(_StateTP.projectPath + "\\datasets\\" + value.filename)) {
-                    output.push(value);
-                } else {
-                    delete _U.solution.dataset[index];
-                    saveProjectData()
-                }
-            }
-        });
-    } else {
-        $.each(_U.solution.dataset, function(index, datasetState) {
-            if(datasetState.groupID == tGroupID) {
-                if(datasetState != undefined && datasetState != null) {
-                    if(fs.existsSync(_StateTP.projectPath + "\\datasets\\" + datasetState.filename)) {
-                        output.push(datasetState);
+    if(_U.project.namespace != "none") {
+        if(tGroupID == undefined || _U.project.state.lbGroupAll == true) {
+            $.each(_U.solution.dataset, function( index, value ) {
+                if(value != undefined && value != null) {
+                    if(fs.existsSync(_StateTP.projectPath + "\\datasets\\" + value.filename)) {
+                        output.push(value);
                     } else {
                         delete _U.solution.dataset[index];
                         saveProjectData()
                     }
                 }
-            }
-        });
+            });
+        } else {
+            $.each(_U.solution.dataset, function(index, datasetState) {
+                if(datasetState != undefined && datasetState != null) {
+                    if(datasetState.groupID == tGroupID) {
+                        if(fs.existsSync(_StateTP.projectPath + "\\datasets\\" + datasetState.filename)) {
+                            output.push(datasetState);
+                        } else {
+                            delete _U.solution.dataset[index];
+                            saveProjectData()
+                        }
+                    }
+                }
+            });
+        }
     }
     return output;
 }

@@ -18,9 +18,11 @@
             <ul>
                 <script>
                     $('#list-label ul').html('');
-                    $.each(_U.solution.label, function( index, value ) {
-                        $('#list-label ul').append('<li><a>' + value + '</a></li>');
-                    });
+                    if(_U.project.namespace != "none") {
+                        $.each(_U.solution.label, function( index, value ) {
+                            $('#list-label ul').append('<li><a>' + value + '</a></li>');
+                        });
+                    }
                 </script>
             </ul>
         </div>
@@ -29,9 +31,11 @@
             <ul>
                 <script>
                     $('#list-queue-image ul').html('');
-                    $.each(getDatasets(_U.project.state.groupSelected), function( index, value ) {
-                        $('#list-queue-image ul').append('<li onclick="imgCropSelect( ' + index + ', this)"><a>' + value.filename + '</a></li>');
-                    });
+                    if(_U.project.namespace != "none") {
+                        $.each(getDatasets(_U.project.state.groupSelected), function( index, value ) {
+                            $('#list-queue-image ul').append('<li onclick="imgCropSelect( ' + index + ', this)"><a>' + value.filename + '</a></li>');
+                        });
+                    }
                 </script>
             </ul>
         </div>
