@@ -1,0 +1,20 @@
+<div class="dialog-header" style="width: 500px;">
+    <h4 part="title">Edit Label Group</h4>
+    <a class="a-exit" onclick="closeDialog()">X</a>
+</div>
+<div class="dialog-content">
+    <p>Group Name:</p>
+    <input id="lbGroupName" name="label" type="text" onkeyup="labelGroupOnchange()">
+    <p>Namespace:</p>
+    <input id="lbGroupNamespace" name="namespace" type="text" disabled>
+</div>
+<div class="dialog-footer">
+    <p class="loadingIcon"></p>
+    <button class="red" style="float: left;" onclick="deleteLabelGroup(this)">Delete</button>
+    <button onclick="editLabelGroup(this)">Edit</button>
+    <button onclick="closeDialog()">Cancel</button>
+</div>
+<script>
+    $('#lbGroupName').val(_StateTP.crrEditGroupState.name);
+    $('#lbGroupNamespace').val(_StateTP.crrEditGroupState.namespace);
+</script>

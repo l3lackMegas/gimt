@@ -1,0 +1,130 @@
+#pageCroping {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+#pageCroping .panel-backgroundImage {
+    position: relative;
+    width: calc(100% - 250px);
+    height: 100%;
+    background-color: var(--bg-work-area);
+}
+
+#pageCroping .panel-list {
+    width: 250px;
+    height: 100%;
+    background-color: var(--bg-main);
+    border-left: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+#pageCroping .contentArea {
+    padding: 0;
+    width: 100%;
+}
+
+#pageCroping .contentArea .title {
+    background-color: #282b2b;
+    padding: 10px;
+    border-left: 3px #ccc solid;
+}
+
+#list-label {
+    height: 230px;
+}
+#list-queue-image {
+    height: calc(100% - 250px);
+}
+
+#pageCroping .panel-list ul {
+    list-style-type: none;
+    padding: 0;
+    overflow: auto;
+    height: calc(100% - 22px);
+}
+
+#pageCroping .panel-list ul li {
+    display: block;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+#pageCroping .panel-list ul li.active {
+    background-color: rgba(255,255,255,.2);
+    color: white;
+}
+
+#pageCroping .panel-list ul li.active:hover {
+    background-color: rgba(255,255,255,.25);
+    color: white;
+}
+
+#pageCroping .panel-list ul li:hover {
+    background-color: rgba(255,255,255,.1);
+    color: white;
+}
+
+#pageCroping .panel-list ul li:active {
+    background-color: rgba(255,255,255,.2);
+}
+
+#pageCroping .panel-list ul li a {
+    display: inline-block;
+    padding: 5px 12px;
+    transition-duration: .25s;
+}
+
+#imgPositionControl {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+
+#exampleIMG {
+    position: absolute;
+    margin-bottom: 20px;
+    top: 50%;
+    left: 50%;
+    max-width: calc(100% - 20px);
+    max-height: calc(100% - 20px);
+    transform:  translateY(-50%) translateX(-50%) scale(1);
+    background-repeat: no-repeat;
+    background-position: center;
+    animation: fadeIn .25s;
+}
+
+#exampleIMG img {
+    margin-right: 10px;
+    width: 100%;
+    box-shadow: 0 0 5px 1px black;
+    transition-duration: .25s;
+}
+
+#tools-float {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0,0,0,.7);
+    color: white;
+    box-shadow: 0 0 5px 1px rgba(255, 255, 255, 0.16);
+    border-radius: 2px;
+}
+
+#tools-float a {
+    display: inline-block;
+    padding: 0 15px;
+    height: 50px;
+    line-height: 50px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+#tools-float a:hover {
+    background-color: rgba(255,255,255,.2);
+}
+
+#tools-float a:active {
+    background-color: rgba(255,255,255,.4);
+}

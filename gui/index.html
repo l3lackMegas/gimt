@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>GUI Image Model-training</title>
+        <link rel="stylesheet" type="text/css" href="./css/style.css">
+        <link rel="stylesheet" type="text/css" href="./css/wasumi-msg-dialog.css">
+        <link rel="stylesheet" type="text/css" href="./platform/css/platform-windows.css">
+        <link rel="stylesheet" type="text/css" href="./css/pages.css">
+
+        <!-- Insert this line above script imports  -->
+        <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+
+        <!-- normal script imports etc  -->
+        <script src="./js/jquery.min.js"></script>
+        <script src="./platform/js/platform-windows.js"></script>
+        <script src="./js/wasumi-msg-dialog.js"></script>
+        <script src="./js/index.js"></script>
+        <script src="./js/handle.js"></script>
+        <script defer src="https://use.fontawesome.com/releases/v5.6.3/js/all.js" integrity="sha384-EIHISlAOj4zgYieurP0SdoiBYfGJKkgWedPHH4jCzpCXLmzVsw1ouK59MuUtP4a1" crossorigin="anonymous"></script>
+
+        <!-- Insert this line after script imports -->
+        <script>
+            if (window.module) module = window.module;
+            const wasumiMessage = wasuInit({
+                element: 'body',
+                animation: 'zoomIn',
+                animationDuration: '.25s'
+            });
+        </script>
+    </head>
+    <body onload="afterAppStart();">
+        <div id="app-titleBar">
+            <span><img id="favicon" src="img/mini-Logo.png"></span>
+            <div id="app-frame"></div>
+            <div class="btnArea">
+                <button id="btn-min">−</button>
+                <button id="btn-max">&square;</button>
+                <button id="btn-close">X</button>
+            </div>
+        </div>
+        <div id="modalBackdrop">
+            <div class="contain">
+                <div class="clsDislog" onclick="closeDialog()"></div>
+                <dialog id="dialog" open>
+                    
+                </dialog>
+            </div>
+        </div>
+        <div id="app-contentArea">
+            <div id="side-menu">
+                <button class="btn-cls" onclick="toggleSideMenu()"><i class="fas fa-arrow-left"></i></button>
+                <div class="sideMenuCover"></div>
+                <div class="menu-area">
+                    <a class="active" pg-navi= "dashboard" onclick="sideMenuHandle('dashboard', this);"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    <a pg-navi= "datasets" onclick="sideMenuHandle('datasets', this);"><i class="fas fa-images"></i> Datasets</a>
+                    <a pg-navi= "image-croping" onclick="sideMenuHandle('image-croping', this);"><i class="fas fa-crop-alt"></i> Cropping</a>
+                </div>
+            </div>
+            <div class="toolsMenu">
+                <button id="btn-main-menu" onclick="toggleSideMenu()"><i class="fas fa-bars"></i></button>
+                <div id="tab-option-module" class="panel-tab-option" onclick="optionModule(this)">
+                    <i class="fas fa-cubes"></i>
+                    <div class="detailArea">
+                        <p>Model Name:</p>
+                        <h3>No model selected</h3>
+                    </div>
+                    <p class="arrow-right">
+                        <span class="down" style="display: block;"><i class="fas fa-sort-down"></i></span>
+                        <span class="up"><i class="fas fa-sort-up"></i></span>
+                    </p>
+                </div>
+                <div id="tab-option-labelGroup" class="panel-tab-option disable" onclick="optionGroup(this)">
+                    <i class="far fa-object-group"></i>
+                    <div class="detailArea">
+                        <p>Label Group:</p>
+                        <h3>No group selected</h3>
+                    </div>
+                    <p class="arrow-right">
+                        <span class="down" style="display: block;"><i class="fas fa-sort-down"></i></span>
+                        <span class="up"><i class="fas fa-sort-up"></i></span>
+                    </p>
+                </div>
+                <div id="training-panel" class="panel-tab-option pointing disable" onclick="handleTraining(this)">
+                    <i class="fas fa-play"></i>
+                    <div>
+                        <h3>Start Train</h3>
+                        <p class="subTxt">with GPU</p>
+                    </div>
+                </div>
+                <div id="label-panel" class="btn-panel">
+                    <button><i class="far fa-edit"></i></button>
+                    <button><i class="far fa-trash-alt"></i></button>
+                    <button><i class="fas fa-ellipsis-v"></i></button>
+                </div>
+            </div>
+            <div id="pageArea" class="page">
+                <script>
+                    loadComponent('./page/dashboard' ,'#pageArea');
+                </script>
+            </div>
+        </div>
+        <div id="footerStatus">
+            <span id="footer-txtStatus"><i class="fas fa-circle-notch fa-spin"></i> Preparing...</span>
+        </div>
+        <script>
+            function afterAppStart() {
+                setTimeout(() => {
+                    loadFunction();
+                }, 1500);
+            }
+        </script>
+    </body>
+</html>

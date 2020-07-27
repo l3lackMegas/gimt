@@ -1,0 +1,252 @@
+<script>
+    var appToolbars = new appframeInit({
+        id: '#app-frame',
+        menuTools: [
+            {
+                namespace: 'file',
+                label: 'File',
+                subSection: [
+                    [
+                        {
+                            namespace: 'add-model',
+                            label: 'New Model',
+                            action: function(data) {
+                                alert(data.label + ' Clicked!');
+                            }
+                        },
+                        {
+                            namespace: 'add-label',
+                            label: 'New Label Group',
+                            action: function(data) {
+                                alert(data.label + ' Clicked!');
+                            }
+                        }
+                    ],
+                    [
+                        {
+                            namespace: 'open-model',
+                            label: 'Open Model',
+                            action: function(data) {
+                                alert(data.label + ' Clicked!');
+                            }
+                        },
+                        {
+                            namespace: 'open-recent',
+                            label: 'Open Recent',
+                            isDisable: (() => (_State.lastOpen.length == 0))(),
+                            subSection: [
+                                getRecent4Frame()
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            namespace: 'save-project',
+                            label: 'Save',
+                            action: function(data) {
+                                saveProjectData()
+                            }
+                        }
+                    ],
+                    [
+                        {
+                            namespace: 'import',
+                            label: 'Import',
+                            subSection: [
+                                [
+                                    {
+                                        namespace: 'import-weight',
+                                        label: 'Import Weight',
+                                        isDisable: true,
+                                        action: function(data) {
+                                            alert(data.label + ' Clicked!');
+                                        }
+                                    },
+                                    {
+                                        namespace: 'import-dataset',
+                                        label: 'Import Dataset',
+                                        isDisable: true,
+                                        action: function(data) {
+                                            alert(data.label + ' Clicked!');
+                                        }
+                                    }
+                                ]
+                            ]
+                        },
+                        {
+                            namespace: 'export',
+                            label: 'Export',
+                            subSection: [
+                                [
+                                    {
+                                        namespace: 'export-weight',
+                                        label: 'Export Weight',
+                                        isDisable: true,
+                                        action: function(data) {
+                                            alert(data.label + ' Clicked!');
+                                        }
+                                    },
+                                    {
+                                        namespace: 'export-dataset',
+                                        label: 'Export Dataset',
+                                        isDisable: true,
+                                        action: function(data) {
+                                            alert(data.label + ' Clicked!');
+                                        }
+                                    }
+                                ]
+                            ]
+                        }
+                    ],
+                    [
+                        {
+                            namespace: 'restart',
+                            label: 'Restart',
+                            action: function(data) {
+                                location.reload();
+                            }
+                        },
+                        {
+                            namespace: 'exit',
+                            label: 'Exit',
+                            action: function(data) {
+                                remote.getCurrentWindow().close();
+                            }
+                        }
+                    ]
+                ]
+            },
+            {
+                namespace: 'edit',
+                label: 'Edit',
+                subSection: [
+                    [
+                        {
+                            namespace: 'edit-project-name',
+                            label: 'Edit Project Name',
+                            isDisable: true,
+                            action: function (data) {
+                                alert(data.label + ' Clicked!');
+                            }
+                        },
+                        {
+                            namespace: 'edit-model-name',
+                            label: 'Edit Model Name',
+                            isDisable: true,
+                            action: function (data) {
+                                alert(data.label + ' Clicked!');
+                            }
+                        },
+                        {
+                            namespace: 'edit-label-group',
+                            label: 'Edit Label Group Name',
+                            isDisable: (() => (_U.project.state.groupSelected == 0))(),
+                            action: function (data) {
+                                dropGroupEdit();
+                            }
+                        }
+                    ],
+                    [
+                        {
+                            namespace: 'setting',
+                            label: 'Setting',
+                            action: function (data) {
+                                alert(data.label + ' Clicked!');
+                            }
+                        }
+                    ]
+                ]
+            },
+            {
+                namespace: 'model',
+                label: 'Model',
+                subSection: [
+                    [
+                        {
+                            namespace: 'start-train',
+                            label: 'Start Train',
+                            isDisable: true,
+                            action: function (data) {
+                                handleTraining($('#training-panel')[0]);
+                            }
+                        },
+                        {
+                            namespace: 'stop-train',
+                            label: 'Stop Train',
+                            isDisable: true,
+                            action: function (data) {
+                                handleTraining($('#training-panel')[0]);
+                            }
+                        }
+                    ],
+                    [
+                        {
+                            namespace: 'test-model',
+                            label: 'Test Model',
+                            isDisable: true,
+                            action: function (data) {
+                                alert(data.label + ' Clicked!');
+                            }
+                        }
+                    ]
+                ]
+            },
+            {
+                namespace: 'help',
+                label: 'Help',
+                subSection: [
+                    [
+                        {
+                            namespace: 'introduction',
+                            label: 'Introduction',
+                            action: function (data) {
+                                alert(data.label + ' Clicked!');
+                            }
+                        }
+                    ],
+                    [
+                        {
+                            namespace: 'contact',
+                            label: 'Contact Developer',
+                            action: function (data) {
+                                alert(data.label + ' Clicked!');
+                            }
+                        }
+                    ],
+                    [
+                        {
+                            namespace: 'report-issue',
+                            label: 'Report Issue',
+                            action: function (data) {
+                                alert(data.label + ' Clicked!');
+                            }
+                        },
+                        {
+                            namespace: 'request-feature',
+                            label: 'Request Feature',
+                            action: function (data) {
+                                alert(data.label + ' Clicked!');
+                            }
+                        },
+                        {
+                            namespace: 'check-update',
+                            label: 'Check Update',
+                            action: function (data) {
+                                alert(data.label + ' Clicked!');
+                            }
+                        }
+                    ],
+                    [
+                        {
+                            namespace: 'about',
+                            label: 'About',
+                            action: function (data) {
+                                alert('GUI Image Model-training.');
+                            }
+                        }
+                    ]
+                ]
+            }
+        ]
+    });
+</script>

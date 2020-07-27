@@ -1,0 +1,43 @@
+<div id="pageCroping" class="areaPage">
+    <div class="panel-backgroundImage">
+        <div id="imgPositionControl">
+            <div id="exampleIMG" target="0"><img></div>
+        </div>
+        <div id="tools-float">
+            <a><i class="fas fa-crop-alt"></i></a>
+            <a><i class="fas fa-eraser"></i></a>
+            <a onclick="imgCropPositionControl('zoomOut');"><i class="fas fa-search-minus"></i></a>
+            <a onclick="imgCropPositionControl('zoomIn');"><i class="fas fa-search-plus"></i></a>
+            <a onclick="imgCropArrowsNavigate('back');"><i class="fas fa-chevron-left"></i></a>
+            <a onclick="imgCropArrowsNavigate('next');"><i class="fas fa-chevron-right"></i></a>
+        </div>
+    </div>
+    <div class="panel-list">
+        <div id="list-label" class="contentArea">
+            <h4 class="title">Label List</h4>
+            <ul>
+                <script>
+                    $('#list-label ul').html('');
+                    if(_U.project.namespace != "none") {
+                        $.each(_U.solution.label, function( index, value ) {
+                            $('#list-label ul').append('<li><a>' + value + '</a></li>');
+                        });
+                    }
+                </script>
+            </ul>
+        </div>
+        <div id="list-queue-image" class="contentArea">
+            <h4 class="title">Queue Images</h4>
+            <ul>
+                <script>
+                    $('#list-queue-image ul').html('');
+                    if(_U.project.namespace != "none") {
+                        $.each(getDatasets(_U.project.state.groupSelected), function( index, value ) {
+                            $('#list-queue-image ul').append('<li onclick="imgCropSelect( ' + index + ', this)"><a>' + value.filename + '</a></li>');
+                        });
+                    }
+                </script>
+            </ul>
+        </div>
+    </div>
+</div>

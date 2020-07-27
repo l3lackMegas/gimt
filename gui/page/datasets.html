@@ -1,0 +1,103 @@
+<div id="pageDatasets" class="areaPage">
+    <div id="image-grid-area" class="grid-panel">
+        <script>
+            $('#image-grid-area').html('');
+            var itemImgDataset = getDatasets(_U.project.state.groupSelected);
+            $.each(itemImgDataset, function( index, value ) {
+                $('#image-grid-area').append('<div class="item-box" onclick="openImageCrop(\'' + index + '\');"><div class="img-pv" style="background-image: url(' + fileUrl(_StateTP.projectPath + "\\datasets\\" + value.filename) + ');"></div></div>');
+            });
+        </script>
+    </div>
+</div>
+<script>
+    $('#image-grid-area').width(160 * Math.floor(($("#pageDatasets").width() / 160)));
+    $("#pageDatasets").on("dragover", function(event) {
+        event.preventDefault();  
+        event.stopPropagation();
+        $('#pageDatasets').addClass('highligh');
+    });
+
+    $("#pageDatasets").on("dragleave", function(event) {
+        event.preventDefault();  
+        event.stopPropagation();
+        $('#pageDatasets').removeClass('highligh');
+    });
+
+    $("#pageDatasets").on("drop", function(ev) {
+        event.preventDefault();  
+        event.stopPropagation();
+        $('#pageDatasets').removeClass('highligh');
+        if(ev.originalEvent.dataTransfer){
+            if(ev.originalEvent.dataTransfer.files.length) {
+                var droppedFiles = ev.originalEvent.dataTransfer.files;
+                $(ev.originalEvent.dataTransfer.files).each(function(){
+                    var img = new Image;
+                    img.onload = convert;
+                    img.src = URL.createObjectURL(this);
+                    /*var reader = new FileReader();
+                    reader.readAsDataURL(this);
+                    reader.onload = function(readEvent) {
+                        
+                    }
+                    console.log(this.type);*/
+                });
+            }
+        }
+    });
+
+    $('#image-grid-area').click(function(e) {
+        var bg = $(e.target).css('background-image');
+        bg = bg.replace('url(','').replace(')','');
+        if(bg != 'none') {
+            console.log(bg);
+        }
+    });
+
+    function convert() {
+        URL.revokeObjectURL(this.src);             // free up memory
+        var c = document.createElement("canvas"),  // create a temp. canvas
+            ctx = c.getContext("2d");
+        c.width = this.width;                      // set size = image, draw
+        c.height = this.height;
+        ctx.drawImage(this, 0, 0);
+        
+        // convert to File object, NOTE: we're using binary mime-type for the final Blob/File
+        c.toBlob(function(blob) {
+            var otDetail = {
+                    id: ("000" + _U.project.order.dataset).slice(-4),
+                    filename: ("000" + _U.project.order.dataset).slice(-4) + ".jpg",
+                    extension: "image/jpeg",
+                    groupID: findGroupStateSelected('id', _U.project.state.groupSelected, ['id']),
+                    size: {
+                        width: c.width,
+                        height: c.height
+                    },
+                    tracking: [
+                        {
+                            objectClass: "cat",
+                            x_center: 10,
+                            y_center: 10,
+                            width: 20,
+                            height: 20
+                        }
+                    ]
+                };
+            _U.project.order.dataset++;
+            var file = new File([blob], otDetail.filename, {type: "application/octet-stream"});
+            //window.location = URL.createObjectURL(file);
+            saveBlob(file, _StateTP.projectPath + "\\datasets\\" + otDetail.filename, otDetail);
+        }, "image/jpeg", 0.75);  // mime=JPEG, quality=0.75
+    }
+
+    function saveBlob(blob, fileName, obj) {
+        let reader = new FileReader()
+        reader.onload = function() {
+            if (reader.readyState == 2) {
+                var buffer = new Buffer(reader.result)
+                ipcRenderer.send('SAVE_FILE', fileName, buffer, obj)
+                console.log(`Saving ${JSON.stringify({ fileName, size: blob.size })}`,obj)
+            }
+        }
+        reader.readAsArrayBuffer(blob)
+    }
+    </script>

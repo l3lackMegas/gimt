@@ -1,0 +1,42 @@
+body {
+    border: 1px #4d6063 solid;
+    transition-duration: .25s;
+}
+
+body #footerStatus {
+    background-color: #4d6063;
+    transition-duration: .25s;
+}
+
+#programArea {
+    width: calc(100% - 2px);
+    height: calc(100% - 31px);
+}
+
+body.available {
+    border: 1px var(--border-color) solid;
+}
+
+body.available #footerStatus {
+    background-color: var(--border-color);
+}
+
+body.training {
+    border: 1px var(--border-color-traning) solid;
+}
+
+body.training #footerStatus {
+    background-color: var(--border-color-traning);
+}
+
+body.training {
+    border: 1px var(--border-color-traning) solid;
+}
+
+body.training #footerStatus {
+    background-color: var(--border-color-traning);
+}
+
+body.maximum {
+    border: none;
+}

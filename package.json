@@ -1,0 +1,36 @@
+{
+  "name": "gimt",
+  "version": "1.0.0",
+  "description": "GUI Image Model-training",
+  "main": "main.js",
+  "scripts": {
+    "test": "start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/l3lackMegas/gimt.git"
+  },
+  "keywords": [
+    "AI",
+    "Machine",
+    "Learning",
+    "Image",
+    "Detect",
+    "object",
+    "GUI"
+  ],
+  "author": "l3lackMegas",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/l3lackMegas/gimt/issues"
+  },
+  "homepage": "https://github.com/l3lackMegas/gimt#readme",
+  "devDependencies": {
+    "electron": "^5.0.1"
+  },
+  "dependencies": {
+    "electron-dl": "^1.14.0",
+    "electron-window-state": "^5.0.3",
+    "fs-extra": "^8.0.1"
+  }
+}
